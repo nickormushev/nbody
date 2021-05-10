@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <tgmath.h>
 #include <algorithm>
+#include <chrono>
 
 #define spaceX 1000         //the maximum x cordinate of space
 #define spaceY 1000         //the maximum y coordinate of space
@@ -12,7 +13,7 @@
 #define MAX_RADIUS 3        //the maximum initial radius
 #define MAX_VELOCITY 10     //the maximum allowed initial velocity
 #define MASTER 0            //the processor with id 0
-#define TIME 10             //how many units of time should we simulate
+#define TIME 100             //how many units of time should we simulate
 #define DELTAT 0.1          //one unit of time
 #define ACCURACY 0.5        //how accurate are the barnes hut approximations
 #define GRAVITY 6.67300e-11 //the gravity constand
@@ -715,9 +716,10 @@ void addBody(BHCell* node, Body body) {
     node->bodies.push_back(body);
 
     if(node->isLeaf) {
+        //causes segfault if I use &&. Should check why
         if(node->bodies.size() > 1) {
             createNodeChildren(node);
-        } 
+        }
     } else {
         BHCell* child = node->getChildForBody(body);
         addBody(child, body);
@@ -748,7 +750,7 @@ bool domainCriterion(BHCell* node, OrbTree split) {
  *This method finds the essential nodes for the other side of the splits and adds them
  *to toSend so they can be sent on the next step
  */
-void findEssentialNodes(BHCell* node, std::vector<MessageBody>& toSend,  OrbTree split) {
+void findEssentialNodes(BHCell* node, std::vector<MessageBody>& toSend, OrbTree split) {
     if (node->bodies.size() <= 0) {
         return;
     }
@@ -775,7 +777,7 @@ void buildLocalTree(BHCell* root, std::vector<Body> bodies) {
     }
 }
 
-void receiveData(int neighborRank, std::vector<MessageBody>& essentialBodies) {
+void receiveData(int neighborRank, std::vector<MessageBody>& toAdd) {
 
     MPI_Status stat;
     if (MPI_Probe(neighborRank, 0, MPI_COMM_WORLD, &stat) != MPI_SUCCESS) {
@@ -787,8 +789,8 @@ void receiveData(int neighborRank, std::vector<MessageBody>& essentialBodies) {
 	    throw "failed to get count";
     }
 
-    essentialBodies.resize(cnt);
-    if (MPI_Recv(essentialBodies.data(), cnt, TMPIMessageBody,
+    toAdd.resize(cnt);
+    if (MPI_Recv(toAdd.data(), cnt, TMPIMessageBody,
             neighborRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS) {
         throw "failed to receive data";
     }
@@ -831,8 +833,6 @@ double computeDistance(double x1, double y1, double x2, double y2) {
 void computeCellForce(Body& body, double x, double y, double mass) {
     double dist = computeDistance(body.x, body.y, x, y);
     double force = GRAVITY * (body.mass * mass) / pow(dist, 2.0);
-    body.forceX = 0;
-    body.forceY = 0;
 
     //force direction
     body.forceX += force * ((x - body.x) / dist);
@@ -881,6 +881,31 @@ void updatePositions() {
     for (int i = 0; i < myBodies.size(); ++i) {
         myBodies[i].x += myBodies[i].velocityX * DELTAT;
         myBodies[i].y += myBodies[i].velocityY * DELTAT;
+
+      // Check if particles attempt to cross boundary      
+      //if ((myBodies[i].x + myBodies[i].radius >= spaceX) ||
+      //    (myBodies[i].x - myBodies[i].radius <= 0)) {
+      //  myBodies[i].velocityX *= -1;
+      //} else if ((myBodies[i].y + myBodies[i].radius >= spaceY) || 
+      //         (myBodies[i].y - myBodies[i].radius) <= 0) {
+      //  myBodies[i].velocityY *= -1;
+      //}
+
+        if(myBodies[i].x < 0) {
+            myBodies[i].x = 0;
+            myBodies[i].velocityX *= -1;
+        } else if(myBodies[i].x > spaceX) {
+            myBodies[i].x = spaceX;
+            myBodies[i].velocityX *= -1;
+        }
+
+        if(myBodies[i].y < 0) {
+            myBodies[i].y = 0;
+            myBodies[i].velocityY *= -1;
+        } else if(myBodies[i].y > spaceY) {
+            myBodies[i].y = spaceY;
+            myBodies[i].velocityY *= -1;
+        }
     }
 }
 
@@ -917,8 +942,6 @@ void synchronizeBodies() {
 
     MPI_Allgatherv(myBodies.data(), myBodies.size(), TMPIBody, 
             bodyList.data(), bodyCountForProcessor, displacements, TMPIBody, MPI_COMM_WORLD); 
-
-    MPI_Barrier(MPI_COMM_WORLD);
 }
 /*
  *Adds the nodes to the tree required for the calculations
@@ -929,35 +952,71 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
     bool leftOfSplit;
     int neighborRank;
 
+    auto start = std::chrono::high_resolution_clock::now();
     buildLocalTree(&rootBH, myBodies);
 
     std::vector<OrbTree> splits = getMySplits(myBodies[0], &rootORB);
-    std::vector<MessageBody> toSend;
-    std::vector<MessageBody> toAdd;
 
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << duration.count() << "Local tree and splits time " << std::endl;
 
     //-1 because the last split contains only our area
     for (int i = 0; i < splits.size() - 1; ++i) {
-        toAdd.clear();
-        toSend.clear();
+        std::vector<MessageBody> toSend;
+        std::vector<MessageBody> toAdd;
+        MPI_Barrier(MPI_COMM_WORLD);
+        start = std::chrono::high_resolution_clock::now();
         //recalculate metrics when new bodies have been added
         rootBH.calculateMetrics();
+
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " TIME tree metrics" << std::endl;
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        start = std::chrono::high_resolution_clock::now();
 
         findEssentialNodes(&rootBH, toSend, splits[i]);
         leftOfSplit = processorLeftOfSplit(myBodies[0].x, myBodies[0].y,
                 splits[i].getSplitCoordinate(), splits[i].getIsXSplit());
         neighborRank = getNeighborFromBit(splits[i].getBit());
-       
+
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " find toSend" << std::endl;
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        start = std::chrono::high_resolution_clock::now();
         exchangeNodesAndMerge(leftOfSplit, neighborRank, toAdd, toSend, &rootBH);
+
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " exchange data toSend" << std::endl;
     }
 
+    //std::cout << duration.count() << "TIME Locally Essential " << std::endl;
+
+    int process_Rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
+
+    start = std::chrono::high_resolution_clock::now();
+    std::cout << "SIZE " << myBodies.size() << " rank:" << process_Rank << std::endl;
     for (int i = 0; i < myBodies.size(); ++i) {
         myBodies[i].weight = 0;
+        myBodies[i].forceX = 0;
+        myBodies[i].forceY = 0;
         computeForces(&rootBH, myBodies[i]);
     }
 
     computeVelocity();
     updatePositions();
+
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+    std::cout << duration.count() << "TIME " << std::endl;
 }
 
 void runSimulation(OrbTree root) {
@@ -971,9 +1030,10 @@ void runSimulation(OrbTree root) {
         if(process_Rank == MASTER) {
             std::cout << "--------------------" << i << std::endl;
             printBodyListCoordinates(0);
-            std::cout << "--------------------" << std::endl;
+            std::cout << "--------------------" << i << std::endl;
         }
 
+        auto start = std::chrono::high_resolution_clock::now();
         myNewBodies.clear();
         root = OrbTree(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
         root.split();
@@ -981,7 +1041,9 @@ void runSimulation(OrbTree root) {
         myBodies.clear();
         myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
 
-        MPI_Barrier(MPI_COMM_WORLD);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " ORB tree time " << std::endl;
     }
 }
 
@@ -1060,15 +1122,7 @@ int main(int argc, char *argv[]) {
 
     myBodies.clear();
     myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
-    //printVector(process_Rank, myNewBodies);
-    //printBodyVectorIds(process_Rank, myBodies);
-    //if(process_Rank == MASTER) {
-    //    std::cout << "BEFORE =======================" << std::endl;
-    //    printBodyListCoordinates(process_Rank);
-    //    std::cout << "AFTER =======================" << std::endl;
-    //}
 
-    //buildLocallyEssentialTree(rootORB);
     runSimulation(rootORB);
 
     MPI_Finalize();
