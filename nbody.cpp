@@ -9,7 +9,7 @@
 
 #define spaceX 1000         //the maximum x cordinate of space
 #define spaceY 1000         //the maximum y coordinate of space
-#define bodyCount 360       //how many bodies to simulate
+#define bodyCount 3600      //how many bodies to simulate
 #define MAX_RADIUS 3        //the maximum initial radius
 #define MAX_VELOCITY 10     //the maximum allowed initial velocity
 #define MASTER 0            //the processor with id 0
@@ -584,6 +584,22 @@ class OrbTree {
         return this->bit;
     }
 
+    double getMinY() {
+        return this->minY;
+    }
+
+    double getMaxY() {
+        return this->maxY;
+    }
+
+    double getMinX() {
+        return this->minX;
+    }
+
+    double getMaxX() {
+        return this->maxX;
+    }
+
     OrbTree* getLeft() {
         return this->left;
     }
@@ -715,9 +731,9 @@ void createNodeChildren(BHCell* node) {
 void addBody(BHCell* node, Body body) {
     node->bodies.push_back(body);
 
-    if(node->isLeaf) {
+    if (node->isLeaf) {
         //causes segfault if I use &&. Should check why
-        if(node->bodies.size() > 1) {
+        if (node->bodies.size() > 1) {
             createNodeChildren(node);
         }
     } else {
@@ -727,6 +743,28 @@ void addBody(BHCell* node, Body body) {
 }
 
 
+double computeDistance(double x1, double y1, double x2, double y2) {
+    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+}
+
+/*
+ *Calculates the distance between a segment given by the points (x1, y1), (x2, y2) and the point with
+ *coordinates pointX and pointY
+ */
+double minDistanceToSegment(double x1, double y1, double x2, double y2, double pointX, double pointY) {
+    double lengthSquared = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+    if (lengthSquared == 0) {
+        return computeDistance(x1, y1, pointX, pointY);
+    }
+
+    double dotProduct = (pointX - x1) * (x2 - x1) + (pointY - y1) * (y2 - y1);
+    const float t = std::max(0.0, std::min(1.0, dotProduct / lengthSquared));
+    
+    double segmentX = x1 + t * (x2 - x1);
+    double segmentY = y1 + t * (y2 - y1);
+
+    return computeDistance(segmentX, segmentY, pointX, pointY);
+}
 
 /*
  *This criterion detirmines the distance between the 
@@ -738,11 +776,16 @@ void addBody(BHCell* node, Body body) {
 bool domainCriterion(BHCell* node, OrbTree split) {
     double dist;
     if(split.getIsXSplit()) {
-        dist = std::abs(split.getSplitCoordinate() - node->cmass_x);
+        dist = minDistanceToSegment(split.getSplitCoordinate(), split.getMinY(),
+            split.getSplitCoordinate(), split.getMaxY(), node->cmass_x, node->cmass_y);
+        //std::abs((split.getSplitCoordinate() - node->cmass_x)*dist);
         return dist * ACCURACY < node->width;
     } 
 
-    dist = std::abs(split.getSplitCoordinate() - node->cmass_y);
+    dist = minDistanceToSegment(split.getMinX(), split.getSplitCoordinate(),
+        split.getMaxX(), split.getSplitCoordinate(), node->cmass_x, node->cmass_y);
+
+    //dist = std::abs(split.getSplitCoordinate() - node->cmass_y);
     return dist * ACCURACY < node->height;
 }
 
@@ -808,8 +851,8 @@ void sendData(int neighborRank, std::vector<MessageBody> toSend) {
  *This neighbor exists based on the way we divided the processor
  *during the ORB distribution.
  */
-void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, 
-        std::vector<MessageBody> toAdd, std::vector<MessageBody> toSend, BHCell* root) {
+void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, std::vector<MessageBody> toSend, BHCell* root) {
+    std::vector<MessageBody> toAdd;
 
     //The processors at the left of the split receive and then send
     //those to the right do the opposite so we avoid a deadlock
@@ -824,10 +867,6 @@ void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank,
     for (int i = 0; i < toAdd.size(); ++i) {
         addBody(root, Body(toAdd[i]));
     }
-}
-
-double computeDistance(double x1, double y1, double x2, double y2) {
-    return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
 void computeCellForce(Body& body, double x, double y, double mass) {
@@ -882,15 +921,6 @@ void updatePositions() {
         myBodies[i].x += myBodies[i].velocityX * DELTAT;
         myBodies[i].y += myBodies[i].velocityY * DELTAT;
 
-      // Check if particles attempt to cross boundary      
-      //if ((myBodies[i].x + myBodies[i].radius >= spaceX) ||
-      //    (myBodies[i].x - myBodies[i].radius <= 0)) {
-      //  myBodies[i].velocityX *= -1;
-      //} else if ((myBodies[i].y + myBodies[i].radius >= spaceY) || 
-      //         (myBodies[i].y - myBodies[i].radius) <= 0) {
-      //  myBodies[i].velocityY *= -1;
-      //}
-
         if(myBodies[i].x < 0) {
             myBodies[i].x = 0;
             myBodies[i].velocityX *= -1;
@@ -943,6 +973,7 @@ void synchronizeBodies() {
     MPI_Allgatherv(myBodies.data(), myBodies.size(), TMPIBody, 
             bodyList.data(), bodyCountForProcessor, displacements, TMPIBody, MPI_COMM_WORLD); 
 }
+
 /*
  *Adds the nodes to the tree required for the calculations
  *of it's own bodies.
@@ -962,10 +993,10 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
 
     std::cout << duration.count() << "Local tree and splits time " << std::endl;
 
+    auto startFor = std::chrono::high_resolution_clock::now();
     //-1 because the last split contains only our area
     for (int i = 0; i < splits.size() - 1; ++i) {
         std::vector<MessageBody> toSend;
-        std::vector<MessageBody> toAdd;
         MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
         //recalculate metrics when new bodies have been added
@@ -989,14 +1020,16 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
 
         MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
-        exchangeNodesAndMerge(leftOfSplit, neighborRank, toAdd, toSend, &rootBH);
+        exchangeNodesAndMerge(leftOfSplit, neighborRank, toSend, &rootBH);
 
         end = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
         std::cout << duration.count() << " exchange data toSend" << std::endl;
     }
 
-    //std::cout << duration.count() << "TIME Locally Essential " << std::endl;
+    auto endFor = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(endFor - startFor);
+    std::cout << duration.count() << " TIME Locally Essential For " << std::endl;
 
     int process_Rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
@@ -1024,16 +1057,31 @@ void runSimulation(OrbTree root) {
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
     for (int i = 0; i < TIME; ++i) {
+        auto start = std::chrono::high_resolution_clock::now();
+
         buildLocallyEssentialTree(root);
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " Locally total time" << std::endl;
+
+        MPI_Barrier(MPI_COMM_WORLD);
+        start = std::chrono::high_resolution_clock::now();
+
         synchronizeBodies();
 
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << duration.count() << " SYNC time" << std::endl;
+
+        MPI_Barrier(MPI_COMM_WORLD);
         if(process_Rank == MASTER) {
             std::cout << "--------------------" << i << std::endl;
             printBodyListCoordinates(0);
             std::cout << "--------------------" << i << std::endl;
         }
 
-        auto start = std::chrono::high_resolution_clock::now();
+        start = std::chrono::high_resolution_clock::now();
         myNewBodies.clear();
         root = OrbTree(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
         root.split();
@@ -1041,8 +1089,8 @@ void runSimulation(OrbTree root) {
         myBodies.clear();
         myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
 
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        end = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
         std::cout << duration.count() << " ORB tree time " << std::endl;
     }
 }
@@ -1118,12 +1166,18 @@ int main(int argc, char *argv[]) {
     
     OrbTree rootORB(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     rootORB.split();
 
     myBodies.clear();
     myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
 
     runSimulation(rootORB);
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << duration.count() << " Total time " << std::endl;
 
     MPI_Finalize();
     return 0;
