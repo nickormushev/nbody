@@ -15,7 +15,7 @@
 #define MASTER 0            		          //the processor with id 0
 #define TIME 10             		          //how many units of time should we simulate
 #define DELTAT 0.1          		          //one unit of time
-#define ACCURACY 0.9        		          //how accurate are the barnes hut approximations
+#define ACCURACY 0.2        		          //how accurate are the barnes hut approximations
 #define GRAVITY 6.67300e-11 		          //the gravity constand
 #define MAX_MASS 1000       		          //the maximum mass of the bodies
 #define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
@@ -455,6 +455,21 @@ class OrbTree {
         return left;
     }
 
+    void addBodiesFromSectorToMyBodies(int worldRank) {
+        int processorNumber;
+        MPI_Comm_rank(MPI_COMM_WORLD, &processorNumber);
+
+        if (processorNumber == worldRank) {
+            myNewBodies.clear();
+
+            for (int i = 0; i < bodyCount; ++i) {
+                if(in_borders(bodyList[i], minX, minY, maxX, maxY)) {
+                    myNewBodies.push_back(bodyList[i]);
+                }
+            }
+        }
+    }
+
     //Split the processors into two groups
     //The odd numbered ones in one and the even numbered ones
     //in the other. In a group all processors are id'd from 0 to
@@ -608,23 +623,6 @@ class OrbTree {
         return this->right;
     }
 
-    void addBodiesFromSectorToMyBodies(int worldRank) {
-        int processorNumber;
-        MPI_Comm_rank(MPI_COMM_WORLD, &processorNumber);
-
-        if(processorNumber == worldRank) {
-            myNewBodies.clear();
-        }
-
-        for (int i = 0; i < bodyCount; ++i) {
-            if (processorNumber == worldRank) {
-                if(in_borders(bodyList[i], minX, minY, maxX, maxY)) {
-                    myNewBodies.push_back(bodyList[i]);
-                }
-            }
-        }
-    }
-
     //Split builds the ORB tree
     void split() {
         int groupSize;
@@ -634,13 +632,8 @@ class OrbTree {
         MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
         if(groupSize == 1) {
-            auto start = std::chrono::high_resolution_clock::now();
             int worldRank = getProcessorWorldRank(0, this->processorsSubsetGroup);
             this->addBodiesFromSectorToMyBodies(worldRank);
-            
-            auto end = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-            std::cout << duration.count() << "ORB copy time" << std::endl;
             
             return;
         }
@@ -1080,11 +1073,11 @@ void runSimulation(OrbTree root) {
         std::cout << duration.count() << " SYNC time" << std::endl;
 
         //MPI_Barrier(MPI_COMM_WORLD);
-        if(process_Rank == MASTER) {
-            std::cout << "--------------------" << i << std::endl;
-            printBodyListCoordinates(0);
-            std::cout << "--------------------" << i << std::endl;
-        }
+        //if(process_Rank == MASTER) {
+        //    std::cout << "--------------------" << i << std::endl;
+        //    printBodyListCoordinates(0);
+        //    std::cout << "--------------------" << i << std::endl;
+        //}
 
         start = std::chrono::high_resolution_clock::now();
         myNewBodies.clear();
