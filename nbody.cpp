@@ -72,6 +72,13 @@ struct Body {
     }
 };
 
+void logTime(std::chrono::high_resolution_clock::time_point start, std::string logMessage) {
+    MPI_Barrier(MPI_COMM_WORLD);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << duration.count() << " " << logMessage << std::endl;
+    MPI_Barrier(MPI_COMM_WORLD);
+}
 
 bool in_borders(Body body, double minX, double minY, double maxX, double maxY) {
     return body.x >= minX && body.x <= maxX && body.y >= minY && body.y <= maxY;
@@ -201,11 +208,13 @@ struct BHCell {
         this->cmass_x = cmass_x;
         this->cmass_y = cmass_y;
 
-        for (int i = 0; i < bodies.size(); ++i) {
-            if(in_borders(bodies[i], x, y, x + width, y + height)) {
-                this->bodies.push_back(bodies[i]);
-            }
-        }
+        this->bodies = bodies;
+
+        //for (int i = 0; i < bodies.size(); ++i) {
+        //    if(in_borders(bodies[i], x, y, x + width, y + height)) {
+        //        this->bodies.push_back(bodies[i]);
+        //    }
+        //}
 
         for (int i = 0; i < 4; ++i) {
              this->subcells[i] = new BHCell(*subcells[i]);
@@ -656,9 +665,7 @@ class OrbTree {
 	
         auto start = std::chrono::high_resolution_clock::now();
         this->splitCoordinate = this->findOptimalSplit(maxSplit, splitStart);
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << "ORB split time" << std::endl;
+        logTime(start, "time to find ORB split");
 
         this->divideProcessors(groupSize, this->splitCoordinate);
     }
@@ -981,52 +988,37 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
     int neighborRank;
 
     auto start = std::chrono::high_resolution_clock::now();
-    buildLocalTree(&rootBH, myBodies);
 
+    buildLocalTree(&rootBH, myBodies);
     std::vector<OrbTree> splits = getMySplits(myBodies[0], &rootORB);
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-    std::cout << duration.count() << "Local tree and splits time " << std::endl;
+    logTime(start, "Local tree build and local splits get time");
 
     auto startFor = std::chrono::high_resolution_clock::now();
     //-1 because the last split contains only our area
     for (int i = 0; i < splits.size() - 1; ++i) {
         std::vector<MessageBody> toSend;
-        //MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
         //recalculate metrics when new bodies have been added
         rootBH.calculateMetrics();
-
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " TIME tree metrics" << std::endl;
-        //MPI_Barrier(MPI_COMM_WORLD);
+        logTime(start, " Time for tree metrics recalculation");
 
         start = std::chrono::high_resolution_clock::now();
-
         findEssentialNodes(&rootBH, toSend, splits[i]);
         leftOfSplit = processorLeftOfSplit(myBodies[0].x, myBodies[0].y,
                 splits[i].getSplitCoordinate(), splits[i].getIsXSplit());
         neighborRank = getNeighborFromBit(splits[i].getBit());
 
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " find toSend" << std::endl;
+        logTime(start, "find toSend");
 
         //MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
         exchangeNodesAndMerge(leftOfSplit, neighborRank, toSend, &rootBH);
 
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " exchange data toSend" << std::endl;
+        logTime(start, " exchange bodies");
     }
 
-    auto endFor = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(endFor - startFor);
-    std::cout << duration.count() << " TIME Locally Essential For " << std::endl;
+    logTime(startFor, "TIME Locally Essential For");
 
     int process_Rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
@@ -1044,10 +1036,7 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
     computeVelocity();
     updatePositions();
 
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-
-    std::cout << duration.count() << " TIME computations " << std::endl;
+    logTime(start, "Calculations time");
 }
 
 void runSimulation(OrbTree root) {
@@ -1058,19 +1047,13 @@ void runSimulation(OrbTree root) {
         auto start = std::chrono::high_resolution_clock::now();
 
         buildLocallyEssentialTree(root);
-
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " Locally total time" << std::endl;
+        logTime(start, "Build locally essential tree time");
 
         //MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
 
         synchronizeBodies();
-
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " SYNC time" << std::endl;
+        logTime(start, "time for synchronization of processor bodies");
 
         //MPI_Barrier(MPI_COMM_WORLD);
         //if(process_Rank == MASTER) {
@@ -1087,9 +1070,7 @@ void runSimulation(OrbTree root) {
         myBodies.clear();
         myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
 
-        end = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << duration.count() << " ORB tree time " << std::endl;
+        logTime(start, "ORB build time");
     }
 }
 
@@ -1169,9 +1150,7 @@ int main(int argc, char *argv[]) {
 
     runSimulation(rootORB);
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    std::cout << duration.count() << " Total time " << std::endl;
+    logTime(start, "Total time");
 
     MPI_Finalize();
     return 0;
