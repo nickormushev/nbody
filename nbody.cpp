@@ -9,16 +9,16 @@
 
 #define spaceX 1.0e6        		          //the maximum x cordinate of space
 #define spaceY 1.0e6       		          //the maximum y coordinate of space
-#define bodyCount 1000000 //1600000    		  //how many bodies to simulate
+#define bodyCount 1000//1600000    		          //how many bodies to simulate
 #define MAX_RADIUS 3        		          //the maximum initial radius
 #define MAX_VELOCITY 10     		          //the maximum allowed initial velocity
 #define MASTER 0            		          //the processor with id 0
-#define TIME 10            		          //how many units of time should we simulate
+#define TIME 1            		          //how many units of time should we simulate
 #define DELTAT 0.1          		          //one unit of time
 #define ACCURACY 0.2        		          //how accurate are the barnes hut approximations
 #define GRAVITY 6.67300e-11 		          //the gravity constand
 #define MAX_MASS 1.899e20        		          //the maximum mass of the bodies
-#define BODIES_PER_LEAF 2500     //the amount of bodies stored in a barnes hut tree leaf
+#define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
 #define ORB_SPLIT_ERROR 0.01                   //the allowed difference between the workload and 0.5 during ORB
 #define ORB_REBUILD_WEIGHT 2000             //the required weight difference for orb to rebuild
 
@@ -91,16 +91,16 @@ void logTime(std::chrono::high_resolution_clock::time_point start, std::string l
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
-bool in_borders(Body body, double minX, double minY, double maxX, double maxY) {
+bool in_borders(const Body& body, double minX, double minY, double maxX, double maxY) {
     return body.x >= minX && body.x <= maxX && body.y >= minY && body.y <= maxY;
 }
 
-bool is_below(Body body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
+bool is_below(const Body& body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
     return (isXSplit && in_borders(body, minX, minY, split, maxY)) 
                 || (!isXSplit && in_borders(body, minX, minY, maxX, split));
 }
 
-bool is_above(Body body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
+bool is_above(const Body& body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
     return (isXSplit && in_borders(body, split, minY, maxX, maxY))
         || (!isXSplit && in_borders(body, minX, split, maxX, maxY));
 }
@@ -114,15 +114,6 @@ void printBodyVectorIds(int process_Rank, std::vector<Body> v) {
     for (int i = 0; i < v.size(); ++i) {
         std::cout << v[i].id << " " << v[i].x << " " << v[i].y << " rank:" << process_Rank << std::endl;
     }
-}
-
-template<typename T>
-void printVectorGeneric(std::vector<T> v) {
-    for (int i = 0; i < v.size(); ++i) {
-        v[i].simplePrint();
-    }
-
-    std::cout << std::endl;
 }
 
 void printVector(std::vector<int> v) {
@@ -146,11 +137,11 @@ int getMyBodiesWeight() {
 }
 
 void printMyBodiesWeight(int process_Rank) {
-    std::cout << getMyBodiesWeight() << " rank:" << process_Rank << std::endl;
+    std::cout << "weight: " <<  getMyBodiesWeight() << " rank:" << process_Rank << std::endl;
 }
 
 
-bool shouldRebuild() {
+bool shouldRebuildORB() {
     int size_Of_Cluster;
     MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
     int bodyCountForProcessor[size_Of_Cluster];
@@ -159,7 +150,7 @@ bool shouldRebuild() {
     MPI_Allgather(&myBodiesWeight, 1, MPI_INT, bodyCountForProcessor, 1, MPI_INT, MPI_COMM_WORLD);
 
     for (int i = 0; i < size_Of_Cluster; ++i) {
-        for (int j = 0; j < size_Of_Cluster; ++j) {
+        for (int j = i; j < size_Of_Cluster; ++j) {
             if (std::abs(bodyCountForProcessor[i] - bodyCountForProcessor[j]) >= ORB_REBUILD_WEIGHT) {
                 return true;
             }
@@ -968,7 +959,6 @@ void updatePositions() {
     }
 }
 
-
 void printMyBodiesCoordinates(int process_Rank) {
     if (process_Rank == MASTER) {
         for (int i = 0; i < myBodies.size(); ++i) {
@@ -1022,11 +1012,16 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
     for (int i = 0; i < splits.size() - 1; ++i) {
         std::vector<MessageBody> toSend;
         start = std::chrono::high_resolution_clock::now();
-        //recalculate metrics when new bodies have been added
+
+        //recalculate metrics(center of mass and coordinates)
+        //when new bodies have been added
         rootBH.calculateMetrics();
         logTime(start, " Time for tree metrics recalculation");
 
         start = std::chrono::high_resolution_clock::now();
+
+        //find nodes that might be essential to processors on the other
+        //side of the split and add them to the toSend vector
         findEssentialNodes(&rootBH, toSend, splits[i]);
         leftOfSplit = processorLeftOfSplit(myBodies[0].x, myBodies[0].y,
                 splits[i].getSplitCoordinate(), splits[i].getIsXSplit());
@@ -1034,15 +1029,13 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
 
         logTime(start, "find toSend");
 
-        //MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
+        //Exchange data with your neighbor on the other side of the split
         exchangeNodesAndMerge(leftOfSplit, neighborRank, toSend, &rootBH);
-
         logTime(start, " exchange bodies");
     }
 
     logTime(startFor, "TIME Locally Essential For", "essential");
-
     int process_Rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
@@ -1072,7 +1065,6 @@ void runSimulation(OrbTree root) {
         buildLocallyEssentialTree(root);
         logTime(start, "Build locally essential tree time");
 
-        //MPI_Barrier(MPI_COMM_WORLD);
         start = std::chrono::high_resolution_clock::now();
 
         synchronizeBodies();
@@ -1086,7 +1078,7 @@ void runSimulation(OrbTree root) {
         //}
 
         start = std::chrono::high_resolution_clock::now();
-        if (shouldRebuild()) {
+        if (shouldRebuildORB()) {
             myNewBodies.clear();
             root = OrbTree(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
             root.split();
@@ -1127,7 +1119,6 @@ void printBodyListId(int process_Rank) {
         std::cout << bodyList[i].id << " rank:" << process_Rank << std::endl;
     }
 }
-
 
 void buildTypes() {
     //Body type used for transimitting the body structure
