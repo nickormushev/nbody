@@ -146,12 +146,7 @@ int getMyBodiesWeight() {
 }
 
 void printMyBodiesWeight(int process_Rank) {
-    int weightSum = 0;
-    for (int i = 0; i < myBodies.size(); ++i) {
-        weightSum += myBodies[i].weight;
-    }
-
-    std::cout << weightSum << " rank:" << process_Rank << std::endl;
+    std::cout << getMyBodiesWeight() << " rank:" << process_Rank << std::endl;
 }
 
 
