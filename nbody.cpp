@@ -7,17 +7,17 @@
 #include <algorithm>
 #include <chrono>
 
-#define spaceX 10000        		          //the maximum x cordinate of space
-#define spaceY 10000        		          //the maximum y coordinate of space
-#define bodyCount 1600000    		          //how many bodies to simulate
+#define spaceX 1.0e6        		          //the maximum x cordinate of space
+#define spaceY 1.0e6       		          //the maximum y coordinate of space
+#define bodyCount 1000//1600000    		          //how many bodies to simulate
 #define MAX_RADIUS 3        		          //the maximum initial radius
 #define MAX_VELOCITY 10     		          //the maximum allowed initial velocity
 #define MASTER 0            		          //the processor with id 0
-#define TIME 10             		          //how many units of time should we simulate
+#define TIME 2             		          //how many units of time should we simulate
 #define DELTAT 0.1          		          //one unit of time
 #define ACCURACY 0.2        		          //how accurate are the barnes hut approximations
 #define GRAVITY 6.67300e-11 		          //the gravity constand
-#define MAX_MASS 1000       		          //the maximum mass of the bodies
+#define MAX_MASS 1.899e25        		          //the maximum mass of the bodies
 #define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
 #define ORB_SPLIT_ERROR 0.1                   //the allowed difference between the workload and 0.5 during ORB
 
@@ -919,6 +919,8 @@ void computeVelocity() {
     for (int i = 0; i < myBodies.size(); ++i) {
         myBodies[i].velocityX += (myBodies[i].forceX / myBodies[i].mass) * DELTAT;
         myBodies[i].velocityY += (myBodies[i].forceY / myBodies[i].mass) * DELTAT;
+
+        std::cout << myBodies[i].velocityX << " HERE " << std::endl;
     }
 }
 
