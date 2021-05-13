@@ -9,18 +9,21 @@
 
 #define spaceX 1.0e6        		          //the maximum x cordinate of space
 #define spaceY 1.0e6       		          //the maximum y coordinate of space
-#define bodyCount 1000//1600000    		          //how many bodies to simulate
+#define bodyCount 1000000 //1600000    		  //how many bodies to simulate
 #define MAX_RADIUS 3        		          //the maximum initial radius
 #define MAX_VELOCITY 10     		          //the maximum allowed initial velocity
 #define MASTER 0            		          //the processor with id 0
-#define TIME 2             		          //how many units of time should we simulate
+#define TIME 10            		          //how many units of time should we simulate
 #define DELTAT 0.1          		          //one unit of time
 #define ACCURACY 0.2        		          //how accurate are the barnes hut approximations
 #define GRAVITY 6.67300e-11 		          //the gravity constand
-#define MAX_MASS 1.899e25        		          //the maximum mass of the bodies
-#define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
-#define ORB_SPLIT_ERROR 0.1                   //the allowed difference between the workload and 0.5 during ORB
+#define MAX_MASS 1.899e20        		          //the maximum mass of the bodies
+#define BODIES_PER_LEAF 2500     //the amount of bodies stored in a barnes hut tree leaf
+#define ORB_SPLIT_ERROR 0.01                   //the allowed difference between the workload and 0.5 during ORB
+#define ORB_REBUILD_WEIGHT 2000             //the required weight difference for orb to rebuild
 
+int OrbTotalTime = 0;
+int LocallyEssentialTreeTotalTime = 0; 
 MPI_Datatype TMPIMessageBody;
 //Contains only the essential data for the calculations that is sent between processors
 struct MessageBody {
@@ -72,11 +75,19 @@ struct Body {
     }
 };
 
-void logTime(std::chrono::high_resolution_clock::time_point start, std::string logMessage) {
-    MPI_Barrier(MPI_COMM_WORLD);
+
+void logTime(std::chrono::high_resolution_clock::time_point start, std::string logMessage, std::string addTotal = "") {
+    //MPI_Barrier(MPI_COMM_WORLD);
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     std::cout << duration.count() << " " << logMessage << std::endl;
+
+    if (addTotal == "essential") {
+        LocallyEssentialTreeTotalTime += duration.count();
+    } else if (addTotal == "ORB") {
+        OrbTotalTime += duration.count();
+    }
+
     MPI_Barrier(MPI_COMM_WORLD);
 }
 
@@ -119,6 +130,48 @@ void printVector(std::vector<int> v) {
         std::cout << v[i] << " ";
     }
     std::cout << std::endl;
+}
+
+std::vector<Body> bodyList;
+std::vector<Body> myBodies;
+std::vector<Body> myNewBodies;
+
+int getMyBodiesWeight() {
+    int weightSum = 0;
+    for (int i = 0; i < myBodies.size(); ++i) {
+        weightSum += myBodies[i].weight;
+    }
+
+    return weightSum;
+}
+
+void printMyBodiesWeight(int process_Rank) {
+    int weightSum = 0;
+    for (int i = 0; i < myBodies.size(); ++i) {
+        weightSum += myBodies[i].weight;
+    }
+
+    std::cout << weightSum << " rank:" << process_Rank << std::endl;
+}
+
+
+bool shouldRebuild() {
+    int size_Of_Cluster;
+    MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
+    int bodyCountForProcessor[size_Of_Cluster];
+    int myBodiesWeight = getMyBodiesWeight();
+
+    MPI_Allgather(&myBodiesWeight, 1, MPI_INT, bodyCountForProcessor, 1, MPI_INT, MPI_COMM_WORLD);
+
+    for (int i = 0; i < size_Of_Cluster; ++i) {
+        for (int j = 0; j < size_Of_Cluster; ++j) {
+            if (std::abs(bodyCountForProcessor[i] - bodyCountForProcessor[j]) >= ORB_REBUILD_WEIGHT) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
 }
 
 std::vector<int> getBinary(int number) {
@@ -207,14 +260,7 @@ struct BHCell {
         this->mass = mass;
         this->cmass_x = cmass_x;
         this->cmass_y = cmass_y;
-
         this->bodies = bodies;
-
-        //for (int i = 0; i < bodies.size(); ++i) {
-        //    if(in_borders(bodies[i], x, y, x + width, y + height)) {
-        //        this->bodies.push_back(bodies[i]);
-        //    }
-        //}
 
         for (int i = 0; i < 4; ++i) {
              this->subcells[i] = new BHCell(*subcells[i]);
@@ -345,10 +391,6 @@ struct BHCell {
     }
 };
 
-std::vector<Body> bodyList;
-std::vector<Body> myBodies;
-std::vector<Body> myNewBodies;
-
 /*
  *Orb tree uses the Orthogonal recursive bisection algorithm to distribute the data
  *between the processors.
@@ -377,14 +419,8 @@ class OrbTree {
             }
         }
 
-
-        if (MPI_Allreduce(&workAbove, &globalWorkAbove, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD) != MPI_SUCCESS) {
-            throw "failed to reduce";   
-        }
-
-        if (MPI_Allreduce(&workBelow, &globalWorkBelow, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD) != MPI_SUCCESS) {
-            throw "failed to reduce";   
-        }
+        MPI_Allreduce(&workAbove, &globalWorkAbove, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&workBelow, &globalWorkBelow, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 
         return (double)globalWorkAbove/(globalWorkBelow + globalWorkAbove);
     }
@@ -465,12 +501,10 @@ class OrbTree {
     }
 
     void addBodiesFromSectorToMyBodies(int worldRank) {
-        int processorNumber;
-        MPI_Comm_rank(MPI_COMM_WORLD, &processorNumber);
+        int process_Rank;
+        MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
-        if (processorNumber == worldRank) {
-            myNewBodies.clear();
-
+        if (process_Rank == worldRank) {
             for (int i = 0; i < bodyCount; ++i) {
                 if(in_borders(bodyList[i], minX, minY, maxX, maxY)) {
                     myNewBodies.push_back(bodyList[i]);
@@ -490,13 +524,8 @@ class OrbTree {
 
         left = this->generate_left_group(groupSize);
 
-        if(MPI_Group_incl(processorsSubsetGroup, left.size(), left.data(), &leftGroup) != MPI_SUCCESS) {
-            throw "Failed processor group creation include";
-        }
-
-        if(MPI_Group_excl(processorsSubsetGroup, left.size(), left.data(), &rightGroup) != MPI_SUCCESS) {
-            throw "Failed processor group creation exclude";
-        }
+        MPI_Group_incl(processorsSubsetGroup, left.size(), left.data(), &leftGroup);
+        MPI_Group_excl(processorsSubsetGroup, left.size(), left.data(), &rightGroup);
 
 
         if(this->isXSplit) {
@@ -643,7 +672,6 @@ class OrbTree {
         if(groupSize == 1) {
             int worldRank = getProcessorWorldRank(0, this->processorsSubsetGroup);
             this->addBodiesFromSectorToMyBodies(worldRank);
-            
             return;
         }
 
@@ -919,8 +947,6 @@ void computeVelocity() {
     for (int i = 0; i < myBodies.size(); ++i) {
         myBodies[i].velocityX += (myBodies[i].forceX / myBodies[i].mass) * DELTAT;
         myBodies[i].velocityY += (myBodies[i].forceY / myBodies[i].mass) * DELTAT;
-
-        std::cout << myBodies[i].velocityX << " HERE " << std::endl;
     }
 }
 
@@ -1020,7 +1046,7 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
         logTime(start, " exchange bodies");
     }
 
-    logTime(startFor, "TIME Locally Essential For");
+    logTime(startFor, "TIME Locally Essential For", "essential");
 
     int process_Rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
@@ -1065,14 +1091,17 @@ void runSimulation(OrbTree root) {
         //}
 
         start = std::chrono::high_resolution_clock::now();
-        myNewBodies.clear();
-        root = OrbTree(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
-        root.split();
+        if (shouldRebuild()) {
+            myNewBodies.clear();
+            root = OrbTree(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
+            root.split();
 
-        myBodies.clear();
-        myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
+            myBodies.clear();
+            myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
+        }
 
-        logTime(start, "ORB build time");
+        //printMyBodiesWeight(process_Rank);
+        logTime(start, "ORB build time", "ORB");
     }
 }
 
@@ -1103,6 +1132,7 @@ void printBodyListId(int process_Rank) {
         std::cout << bodyList[i].id << " rank:" << process_Rank << std::endl;
     }
 }
+
 
 void buildTypes() {
     //Body type used for transimitting the body structure
@@ -1136,6 +1166,7 @@ int main(int argc, char *argv[]) {
 
     buildTypes();
 
+    //double startWT = MPI_Wtime();
     MPI_Bcast(bodyList.data(), bodyCount, TMPIBody, MASTER, MPI_COMM_WORLD);
     //mod might cause for more than one processor to be left out
     MPI_Scatter(bodyList.data(), bodyCount/size_Of_Cluster, TMPIBody,
@@ -1153,6 +1184,12 @@ int main(int argc, char *argv[]) {
     runSimulation(rootORB);
 
     logTime(start, "Total time");
+
+    std::cout << "Orb total: " << OrbTotalTime << std::endl;
+    std::cout << "Essential total: " << LocallyEssentialTreeTotalTime << std::endl;
+
+    //double endWT = MPI_Wtime();
+    //std::cout << endWT - startWT << std::endl;
 
     MPI_Finalize();
     return 0;
