@@ -6,25 +6,28 @@
 #include <tgmath.h>
 #include <algorithm>
 #include <chrono>
+#include <fstream>
 
 #define spaceX 1.0e6        		          //the maximum x cordinate of space
-#define spaceY 1.0e6       		          //the maximum y coordinate of space
-#define bodyCount 1000//1600000    		          //how many bodies to simulate
+#define spaceY 1.0e6       		              //the maximum y coordinate of space
+#define bodyCount 500//1600000    		  //how many bodies to simulate
 #define MAX_RADIUS 3        		          //the maximum initial radius
-#define MAX_VELOCITY 10     		          //the maximum allowed initial velocity
+#define MAX_START_VELOCITY 1000      		          //the maximum allowed initial velocity
 #define MASTER 0            		          //the processor with id 0
-#define TIME 1            		          //how many units of time should we simulate
+#define TIME 1000            		          //how many units of time should we simulate
 #define DELTAT 0.1          		          //one unit of time
 #define ACCURACY 0.2        		          //how accurate are the barnes hut approximations
 #define GRAVITY 6.67300e-11 		          //the gravity constand
-#define MAX_MASS 1.899e20        		          //the maximum mass of the bodies
+#define MAX_MASS 1.899e19        		      //the maximum mass of the bodies
 #define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
-#define ORB_SPLIT_ERROR 0.01                   //the allowed difference between the workload and 0.5 during ORB
-#define ORB_REBUILD_WEIGHT 2000             //the required weight difference for orb to rebuild
+#define ORB_SPLIT_ERROR 0.01                  //the allowed difference between the workload and 0.5 during ORB
+#define ORB_REBUILD_WEIGHT 2000               //the required weight difference for orb to rebuild
 
 int OrbTotalTime = 0;
 int LocallyEssentialTreeTotalTime = 0; 
 MPI_Datatype TMPIMessageBody;
+std::ofstream out("coordinates.csv");
+
 //Contains only the essential data for the calculations that is sent between processors
 struct MessageBody {
     double x, y, mass;
@@ -75,7 +78,6 @@ struct Body {
     }
 };
 
-
 void logTime(std::chrono::high_resolution_clock::time_point start, std::string logMessage, std::string addTotal = "") {
     //MPI_Barrier(MPI_COMM_WORLD);
     auto end = std::chrono::high_resolution_clock::now();
@@ -103,11 +105,6 @@ bool is_below(const Body& body, double split, double minX, double minY, double m
 bool is_above(const Body& body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
     return (isXSplit && in_borders(body, split, minY, maxX, maxY))
         || (!isXSplit && in_borders(body, minX, split, maxX, maxY));
-}
-
-bool processorLeftOfSplit(double x, double y, double splitCoordinate, bool isXSplit) {
-    return ((isXSplit && x <= splitCoordinate) 
-            || (!isXSplit && y <= splitCoordinate));
 }
 
 void printBodyVectorIds(int process_Rank, std::vector<Body> v) {
@@ -139,7 +136,6 @@ int getMyBodiesWeight() {
 void printMyBodiesWeight(int process_Rank) {
     std::cout << "weight: " <<  getMyBodiesWeight() << " rank:" << process_Rank << std::endl;
 }
-
 
 bool shouldRebuildORB() {
     int size_Of_Cluster;
@@ -180,7 +176,7 @@ std::vector<int> getBinary(int number) {
     return binary;
 }
 
-int fromBinary(std::vector<int> binary) {
+int fromBinary(const std::vector<int>& binary) {
     int decimal = 0;
     for (int i = 0; i < binary.size(); ++i) {
         decimal += binary[i] * pow(2, i);
@@ -219,6 +215,19 @@ int getProcessorWorldRank(int numProcessor, MPI_Group processorGroup) {
     return worldRank[0];
 }
 
+bool isLeftOfSplit(int bit) {
+    int process_Rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
+    std::vector<int> binary = getBinary(process_Rank);
+
+    //This check is taken from salmon
+    if(binary[bit] ^ 1) {
+        return true;
+    }
+
+    return false;
+}
+
 struct BHCell {
     bool isLeaf;
     double x, y;
@@ -237,7 +246,7 @@ struct BHCell {
     }
 
     void copy(double x, double y, double width, double height, double isLeaf, double mass,
-            double cmass_x, double cmass_y, std::vector<Body> bodies, BHCell * const subcells[4]) {
+            double cmass_x, double cmass_y, const std::vector<Body>& bodies, BHCell * const subcells[4]) {
         this->x = x;       
         this->y = y;
         this->width = width;
@@ -336,11 +345,11 @@ struct BHCell {
 	
     }
 
-    bool bodyInBHCell(Body b) {
+    bool bodyInBHCell(const Body& b) {
         return in_borders(b, this->x, this->y, this->x + this->width, this->y + this->height);
     }
 
-    BHCell* getChildForBody(Body b) {
+    BHCell* getChildForBody(const Body& b) {
         for (int i = 0; i < 4; ++i) {
             if(this->subcells[i]->bodyInBHCell(b)) {
                 return this->subcells[i];
@@ -611,39 +620,39 @@ class OrbTree {
         return *this;
     }
 
-    double getSplitCoordinate() {
+    double getSplitCoordinate() const {
         return this->splitCoordinate;
     }
 
-    double getIsXSplit() {
+    double getIsXSplit() const {
         return this->isXSplit;
     }
 
-    int getBit() {
+    int getBit() const {
         return this->bit;
     }
 
-    double getMinY() {
+    double getMinY() const {
         return this->minY;
     }
 
-    double getMaxY() {
+    double getMaxY() const {
         return this->maxY;
     }
 
-    double getMinX() {
+    double getMinX() const {
         return this->minX;
     }
 
-    double getMaxX() {
+    double getMaxX() const {
         return this->maxX;
     }
 
-    OrbTree* getLeft() {
+    OrbTree* getLeft() const {
         return this->left;
     }
 
-    OrbTree* getRight() {
+    OrbTree* getRight() const {
         return this->right;
     }
 
@@ -710,19 +719,18 @@ class OrbTree {
  *Returns the ORBTree nodes which the current processor is a part of
  *This is done based on one of the elements of the processor.
  */
-std::vector<OrbTree> getMySplits(Body body, OrbTree* root) {
+std::vector<OrbTree> getMySplits(const OrbTree* root)  {
     std::vector<OrbTree> result;
     result.push_back(*root);
-    OrbTree* current = root;
+    const OrbTree* current = root;
+    bool processorLeftOfSplit;
 
     while(current != nullptr) {
-        if (processorLeftOfSplit(body.x, body.y, current->getSplitCoordinate(), current->getIsXSplit()) 
-                && current->getLeft() != nullptr) {
-
+        processorLeftOfSplit = isLeftOfSplit(current->getBit());
+        if (processorLeftOfSplit && current->getLeft() != nullptr) {
             result.push_back(*current->getLeft());
             current = current->getLeft();
-        } else if (!processorLeftOfSplit(body.x, body.y, current->getSplitCoordinate(), current->getIsXSplit()) 
-                && current->getRight() != nullptr) {
+        } else if (!processorLeftOfSplit && current->getRight() != nullptr) {
             result.push_back(*current->getRight());
             current = current->getRight();
         } else {
@@ -754,7 +762,7 @@ void createNodeChildren(BHCell* node) {
     }
 }
 
-void addBody(BHCell* node, Body body) {
+void addBody(BHCell* node, const Body& body) {
     node->bodies.push_back(body);
 
     if (node->isLeaf) {
@@ -763,8 +771,7 @@ void addBody(BHCell* node, Body body) {
             createNodeChildren(node);
         }
     } else {
-        BHCell* child = node->getChildForBody(body);
-        addBody(child, body);
+        addBody(node->getChildForBody(body), body);
     }
 }
 
@@ -799,7 +806,7 @@ double minDistanceToSegment(double x1, double y1, double x2, double y2, double p
  *Then we must calculate the children. So if the criterion
  *is not true we can generalize.
  */
-bool domainCriterion(BHCell* node, OrbTree split) {
+bool domainCriterion(BHCell* node, const OrbTree& split) {
     double dist;
     if(split.getIsXSplit()) {
         dist = minDistanceToSegment(split.getSplitCoordinate(), split.getMinY(),
@@ -813,7 +820,7 @@ bool domainCriterion(BHCell* node, OrbTree split) {
     return dist * ACCURACY < node->height;
 }
 
-void enqueLeafBodies(std::vector<MessageBody>& toSend, std::vector<Body> bodies) {
+void enqueLeafBodies(std::vector<MessageBody>& toSend, const std::vector<Body>& bodies) {
     for (int i = 0; i < bodies.size(); ++i) {
         toSend.push_back(MessageBody(bodies[i].x, bodies[i].y, bodies[i].mass));
     }
@@ -823,7 +830,7 @@ void enqueLeafBodies(std::vector<MessageBody>& toSend, std::vector<Body> bodies)
  *This method finds the essential nodes for the other side of the splits and adds them
  *to toSend so they can be sent on the next step
  */
-void findEssentialNodes(BHCell* node, std::vector<MessageBody>& toSend, OrbTree split) {
+void findEssentialNodes(BHCell* node, std::vector<MessageBody>& toSend, const OrbTree& split) {
     if (node->bodies.size() <= 0) {
         return;
     }
@@ -843,7 +850,7 @@ void findEssentialNodes(BHCell* node, std::vector<MessageBody>& toSend, OrbTree 
  *Creates a barnes hut tree from the bodies that are in the bodies vector.
  *used mainly to build the local tree from myBodies
  */
-void buildLocalTree(BHCell* root, std::vector<Body> bodies) {
+void buildLocalTree(BHCell* root, const std::vector<Body>& bodies) {
     for (int i = 0; i < bodies.size(); ++i) {
         addBody(root, bodies[i]);
     }
@@ -862,7 +869,7 @@ void receiveData(int neighborRank, std::vector<MessageBody>& toAdd) {
             neighborRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 }
 
-void sendData(int neighborRank, std::vector<MessageBody> toSend) {
+void sendData(int neighborRank, const std::vector<MessageBody>& toSend) {
     MPI_Send(toSend.data(), toSend.size(), TMPIMessageBody, neighborRank, 0, MPI_COMM_WORLD);
 }
 
@@ -871,7 +878,7 @@ void sendData(int neighborRank, std::vector<MessageBody> toSend) {
  *This neighbor exists based on the way we divided the processor
  *during the ORB distribution.
  */
-void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, std::vector<MessageBody> toSend, BHCell* root) {
+void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, const std::vector<MessageBody>& toSend, BHCell* root) {
     std::vector<MessageBody> toAdd;
 
     //The processors at the left of the split receive and then send
@@ -884,8 +891,10 @@ void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, std::vector<Messa
         receiveData(neighborRank, toAdd);
     }
 
+    Body child;
     for (int i = 0; i < toAdd.size(); ++i) {
-        addBody(root, Body(toAdd[i]));
+        child =  Body(toAdd[i]);
+        addBody(root, child);
     }
 }
 
@@ -967,9 +976,18 @@ void printMyBodiesCoordinates(int process_Rank) {
     }
 }
 
-void printBodyListCoordinates(int process_Rank) {
+void saveBodyListCoordinatesToFile(int process_Rank, int iteration) {
+    std::string weight;
     for (int i = 0; i < bodyList.size(); ++i) {
-        std::cout << "id: " << bodyList[i].id << " coordinates: " << bodyList[i].x << "," << bodyList[i].y << std::endl;
+        if (bodyList[i].mass <= 1.899e13) {
+            weight = "low";
+        } else if (bodyList[i].mass <= 1.899e16) {
+            weight = "medium";
+        } else {
+            weight = "high";
+        }
+        out << bodyList[i].id << "," << bodyList[i].x << "," 
+            << bodyList[i].y << "," << weight << "," << iteration << std::endl;
     }
 }
 
@@ -995,7 +1013,7 @@ void synchronizeBodies() {
  *Adds the nodes to the tree required for the calculations
  *of it's own bodies.
  */
-void buildLocallyEssentialTree(OrbTree rootORB) {
+void buildLocallyEssentialTree(const OrbTree& rootORB) {
     BHCell rootBH;
     bool leftOfSplit;
     int neighborRank;
@@ -1003,7 +1021,7 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
     auto start = std::chrono::high_resolution_clock::now();
 
     buildLocalTree(&rootBH, myBodies);
-    std::vector<OrbTree> splits = getMySplits(myBodies[0], &rootORB);
+    std::vector<OrbTree> splits = getMySplits(&rootORB);
 
     logTime(start, "Local tree build and local splits get time");
 
@@ -1023,8 +1041,7 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
         //find nodes that might be essential to processors on the other
         //side of the split and add them to the toSend vector
         findEssentialNodes(&rootBH, toSend, splits[i]);
-        leftOfSplit = processorLeftOfSplit(myBodies[0].x, myBodies[0].y,
-                splits[i].getSplitCoordinate(), splits[i].getIsXSplit());
+        leftOfSplit = isLeftOfSplit(splits[i].getBit());
         neighborRank = getNeighborFromBit(splits[i].getBit());
 
         logTime(start, "find toSend");
@@ -1055,7 +1072,7 @@ void buildLocallyEssentialTree(OrbTree rootORB) {
     logTime(start, "Calculations time");
 }
 
-void runSimulation(OrbTree root) {
+void runSimulation(OrbTree& root) {
     int process_Rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
@@ -1070,12 +1087,10 @@ void runSimulation(OrbTree root) {
         synchronizeBodies();
         logTime(start, "time for synchronization of processor bodies");
 
-        //MPI_Barrier(MPI_COMM_WORLD);
-        //if(process_Rank == MASTER) {
-        //    std::cout << "--------------------" << i << std::endl;
-        //    printBodyListCoordinates(0);
-        //    std::cout << "--------------------" << i << std::endl;
-        //}
+        MPI_Barrier(MPI_COMM_WORLD);
+        if(process_Rank == MASTER) {
+            saveBodyListCoordinatesToFile(0, i);
+        }
 
         start = std::chrono::high_resolution_clock::now();
         if (shouldRebuildORB()) {
@@ -1093,7 +1108,16 @@ void runSimulation(OrbTree root) {
 }
 
 double generate_random_double() {
-    return (rand() + 1) / ((double)RAND_MAX + 1);
+    return (rand() + 1) / ((double)RAND_MAX + 2);
+}
+
+double generate_random_double2() {
+    return (double)rand() / RAND_MAX;
+}
+
+//generates a random double in the range of 1 to -1
+double generate_random_double_one_minus_one() {
+    return 2 * generate_random_double2() - 1;
 }
 
 void initialize_bodies() {
@@ -1104,12 +1128,12 @@ void initialize_bodies() {
         Body newBody;
         newBody.id = i;
         newBody.weight = 1;
-        newBody.x = generate_random_double() * maxX;
-        newBody.y = generate_random_double() * maxY;
-        newBody.mass = generate_random_double() * MAX_MASS;
+        newBody.x = 1 + generate_random_double2() * maxX;
+        newBody.y = 1 + generate_random_double2() * maxY;
+        newBody.mass = 1.899e6 + generate_random_double2() * (MAX_MASS - 1.899e6);
         newBody.radius = generate_random_double() * MAX_RADIUS;
-        newBody.velocityX = generate_random_double() * MAX_VELOCITY ;
-        newBody.velocityY = generate_random_double() * MAX_VELOCITY ;
+        newBody.velocityX = 500 + generate_random_double_one_minus_one() * MAX_START_VELOCITY;
+        newBody.velocityY = 500 + generate_random_double_one_minus_one() * MAX_START_VELOCITY;
         bodyList.push_back(newBody);
     }
 }
@@ -1141,8 +1165,8 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
-    if (process_Rank == 0) {
-        srand(time(NULL));
+    if (process_Rank == MASTER) {
+        srand(time(nullptr));
         initialize_bodies();
     } else {
         bodyList.resize(bodyCount);
@@ -1177,6 +1201,7 @@ int main(int argc, char *argv[]) {
     //double endWT = MPI_Wtime();
     //std::cout << endWT - startWT << std::endl;
 
+    out.close();
     MPI_Finalize();
     return 0;
 
