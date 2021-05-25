@@ -10,9 +10,9 @@
 
 #define spaceX 1.0e6        		          //the maximum x cordinate of space
 #define spaceY 1.0e6       		              //the maximum y coordinate of space
-#define bodyCount 500//1600000    		  //how many bodies to simulate
+#define bodyCount 11001//1600000    		  //how many bodies to simulate
 #define MAX_RADIUS 3        		          //the maximum initial radius
-#define MAX_START_VELOCITY 1000      		          //the maximum allowed initial velocity
+#define MAX_START_VELOCITY 1000      		  //the maximum allowed initial velocity
 #define MASTER 0            		          //the processor with id 0
 #define TIME 1000            		          //how many units of time should we simulate
 #define DELTAT 0.1          		          //one unit of time
@@ -21,7 +21,9 @@
 #define MAX_MASS 1.899e19        		      //the maximum mass of the bodies
 #define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
 #define ORB_SPLIT_ERROR 0.01                  //the allowed difference between the workload and 0.5 during ORB
-#define ORB_REBUILD_WEIGHT 2000               //the required weight difference for orb to rebuild
+#define ORB_REBUILD_WEIGHT 5                  //the required work difference between a processors and
+                                              //the average so the ORB tree is rebuilt. It should be a a 
+                                              //value between 1 and 100 representing a percentage
 
 int OrbTotalTime = 0;
 int LocallyEssentialTreeTotalTime = 0; 
@@ -142,14 +144,23 @@ bool shouldRebuildORB() {
     MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
     int bodyCountForProcessor[size_Of_Cluster];
     int myBodiesWeight = getMyBodiesWeight();
+    double globalAvg = 0;
 
     MPI_Allgather(&myBodiesWeight, 1, MPI_INT, bodyCountForProcessor, 1, MPI_INT, MPI_COMM_WORLD);
 
+    for(int i = 0; i < size_Of_Cluster; i++) {
+        globalAvg += bodyCountForProcessor[i];
+    }
+
+    globalAvg /= size_Of_Cluster;
+
     for (int i = 0; i < size_Of_Cluster; ++i) {
-        for (int j = i; j < size_Of_Cluster; ++j) {
-            if (std::abs(bodyCountForProcessor[i] - bodyCountForProcessor[j]) >= ORB_REBUILD_WEIGHT) {
-                return true;
-            }
+        //calculate the percentage difference from the average
+        //if the difference is above the ORB_REBUILD_WEIGHT the tree should be
+        //rebuilt
+        double avg = (globalAvg + bodyCountForProcessor[i]) / 2;
+        if (std::abs(bodyCountForProcessor[i] - globalAvg) / avg  >= (double) ORB_REBUILD_WEIGHT / 100) {
+            return true;
         }
     }
     
