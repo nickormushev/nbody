@@ -1158,6 +1158,30 @@ void buildTypes() {
     MPI_Type_commit(&TMPIMessageBody);
 }
 
+/*
+ *Give every process an equal number of bodies so every the first ORB
+ *split works
+ */
+void initialDistributeBodies(int process_Rank, int size_Of_Cluster) {
+
+    MPI_Bcast(bodyList.data(), bodyCount, TMPIBody, MASTER, MPI_COMM_WORLD);
+
+    //mod might cause for more than one processor to be left out
+    MPI_Scatter(bodyList.data(), bodyCount/size_Of_Cluster, TMPIBody,
+                myBodies.data(), bodyCount/size_Of_Cluster, TMPIBody, MASTER, MPI_COMM_WORLD);
+
+    //The bodies that were not distributed are given to the MASTER process
+    //This is fine because it is only for the first iteration
+    if (process_Rank == MASTER) {
+        int leftBodies = bodyCount % size_Of_Cluster; 
+        int startBody = bodyCount - leftBodies;
+
+        for (int i = 0; i < leftBodies; ++i) {
+            myBodies.push_back(bodyList[startBody + i]);
+        }
+    }
+}
+
 int main(int argc, char *argv[]) {
 
     int process_Rank, size_Of_Cluster;
@@ -1175,12 +1199,7 @@ int main(int argc, char *argv[]) {
     myBodies.resize(bodyCount/size_Of_Cluster); 
 
     buildTypes();
-
-    //double startWT = MPI_Wtime();
-    MPI_Bcast(bodyList.data(), bodyCount, TMPIBody, MASTER, MPI_COMM_WORLD);
-    //mod might cause for more than one processor to be left out
-    MPI_Scatter(bodyList.data(), bodyCount/size_Of_Cluster, TMPIBody,
-                myBodies.data(), bodyCount/size_Of_Cluster, TMPIBody, MASTER, MPI_COMM_WORLD);
+    initialDistributeBodies(process_Rank, size_Of_Cluster);
 
     OrbTree rootORB(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
 
@@ -1197,9 +1216,6 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Orb total: " << OrbTotalTime << std::endl;
     std::cout << "Essential total: " << LocallyEssentialTreeTotalTime << std::endl;
-
-    //double endWT = MPI_Wtime();
-    //std::cout << endWT - startWT << std::endl;
 
     out.close();
     MPI_Finalize();

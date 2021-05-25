@@ -23,4 +23,5 @@ p <- ggplot(
 ani <- p + transition_time(iteration) +
     labs(title = "iteration: {frame_time}");
 
-animate(ani, duration = 10, fps = 24, renderer = gifski_renderer("test.gif"))
+animate(ani, duration = 10, fps = 24,
+        renderer = gifski_renderer("test.gif"), height = 1200, width = 1200)
