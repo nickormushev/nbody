@@ -1035,15 +1035,9 @@ void buildLocallyEssentialTree(const OrbTree& rootORB) {
 
     auto startFor = std::chrono::high_resolution_clock::now();
     //-1 because the last split contains only our area
+    rootBH.calculateMetrics();
     for (int i = 0; i < splits.size() - 1; ++i) {
         std::vector<MessageBody> toSend;
-        start = std::chrono::high_resolution_clock::now();
-
-        //recalculate metrics(center of mass and coordinates)
-        //when new bodies have been added
-        rootBH.calculateMetrics();
-        logTime(start, " Time for tree metrics recalculation");
-
         start = std::chrono::high_resolution_clock::now();
 
         //find nodes that might be essential to processors on the other
@@ -1058,6 +1052,12 @@ void buildLocallyEssentialTree(const OrbTree& rootORB) {
         //Exchange data with your neighbor on the other side of the split
         exchangeNodesAndMerge(leftOfSplit, neighborRank, toSend, &rootBH);
         logTime(start, " exchange bodies");
+
+        start = std::chrono::high_resolution_clock::now();
+        //recalculate metrics(center of mass and coordinates)
+        //when new bodies have been added
+        rootBH.calculateMetrics();
+        logTime(start, " Time for tree metrics recalculation");
     }
 
     logTime(startFor, "TIME Locally Essential For", "essential");
