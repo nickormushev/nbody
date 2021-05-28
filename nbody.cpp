@@ -101,7 +101,7 @@ bool in_borders(const Body& body, double minX, double minY, double maxX, double 
 
 bool is_below(const Body& body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
     return (isXSplit && in_borders(body, minX, minY, split, maxY)) 
-                || (!isXSplit && in_borders(body, minX, minY, maxX, split));
+        || (!isXSplit && in_borders(body, minX, minY, maxX, split));
 }
 
 bool is_above(const Body& body, double split, double minX, double minY, double maxX, double maxY, bool isXSplit) {
@@ -205,7 +205,7 @@ int getNeighborFromBit(int bitPosition) {
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
     std::vector<int> pRankInBinary = getBinary(process_Rank);
-    if(pRankInBinary[bitPosition] == 1) {
+    if(pRankInBinary[bitPosition]) {
         pRankInBinary[bitPosition] = 0;
     } else {
         pRankInBinary[bitPosition] = 1;
@@ -216,14 +216,13 @@ int getNeighborFromBit(int bitPosition) {
 
 //returns the processor global number
 int getProcessorWorldRank(int numProcessor, MPI_Group processorGroup) {
-    int currentRank[1] = { numProcessor };
-    int worldRank[1];
+    int worldRank;
     MPI_Group worldGroup;
     MPI_Comm_group(MPI_COMM_WORLD, &worldGroup);
     //translate local group id's to global group id's also called world ranks
-    MPI_Group_translate_ranks(processorGroup, 1, currentRank, worldGroup, worldRank);
+    MPI_Group_translate_ranks(processorGroup, 1, &numProcessor, worldGroup, &worldRank);
 
-    return worldRank[0];
+    return worldRank;
 }
 
 bool isLeftOfSplit(int bit) {
@@ -362,7 +361,7 @@ struct BHCell {
 
     BHCell* getChildForBody(const Body& b) {
         for (int i = 0; i < 4; ++i) {
-            if(this->subcells[i]->bodyInBHCell(b)) {
+            if (this->subcells[i]->bodyInBHCell(b)) {
                 return this->subcells[i];
             }
         }
@@ -454,7 +453,6 @@ class OrbTree {
                 splitCoordinate -= step * maxSplit;
             }
 
-
             i++;
 
             //Make the step smaller with time so we can get closer to the
@@ -498,6 +496,9 @@ class OrbTree {
             std::vector<int> binary = getBinary(world_rank);
 
             //This check is taken from salmon
+            //It divides the processor on the two sides of the 
+            //split in such a way that there will always be someone
+            //to communicate with
             if(binary[this->bit] ^ 1) {
                 left.push_back(i);
             }
@@ -532,7 +533,6 @@ class OrbTree {
 
         MPI_Group_incl(processorsSubsetGroup, left.size(), left.data(), &leftGroup);
         MPI_Group_excl(processorsSubsetGroup, left.size(), left.data(), &rightGroup);
-
 
         if(this->isXSplit) {
             this->left = new OrbTree(leftGroup, minX, minY, splitCoordinate, maxY, this->bit + 1);
@@ -590,25 +590,16 @@ class OrbTree {
     public:
     OrbTree() {
         this->copyCoordinates(0,0, spaceX, spaceY, 0);
-
-        this->left = nullptr;
-        this->right = nullptr;
     }
 
     OrbTree(MPI_Comm comm, double minX, double minY, double maxX, double maxY, int bit = 0) {
         MPI_Comm_group(comm, &processorsSubsetGroup);
         this->copyCoordinates(minX, minY, maxX, maxY, bit);
-
-        this->left = nullptr;
-        this->right = nullptr;
     }
 
     OrbTree(MPI_Group group, double minX, double minY, double maxX, double maxY, int bit = 0) {
         this->processorsSubsetGroup = group;
         this->copyCoordinates(minX, minY, maxX, maxY, bit);
-
-        this->left = nullptr;
-        this->right = nullptr;
     }
     
     OrbTree(const OrbTree &other){
@@ -672,10 +663,9 @@ class OrbTree {
         int groupSize;
         MPI_Group_size(processorsSubsetGroup, &groupSize);
 
-        int process_Rank;
-        MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
-
         if(groupSize == 1) {
+            //all processors inside a group are indexed from zero. 
+            //I need their global rank so I call this function to translate it
             int worldRank = getProcessorWorldRank(0, this->processorsSubsetGroup);
             this->addBodiesFromSectorToMyBodies(worldRank);
             return;
@@ -773,16 +763,13 @@ void createNodeChildren(BHCell* node) {
     }
 }
 
-void addBody(BHCell* node, const Body& body) {
+void addBodyToBHTree(BHCell* node, const Body& body) {
     node->bodies.push_back(body);
 
-    if (node->isLeaf) {
-        //causes segfault if I use &&. Should check why
-        if (node->bodies.size() > BODIES_PER_LEAF) {
-            createNodeChildren(node);
-        }
-    } else {
-        addBody(node->getChildForBody(body), body);
+    if (node->isLeaf && node->bodies.size() > BODIES_PER_LEAF) {
+        createNodeChildren(node);
+    } else if(!node->isLeaf) {
+        addBodyToBHTree(node->getChildForBody(body), body);
     }
 }
 
@@ -863,7 +850,7 @@ void findEssentialNodes(BHCell* node, std::vector<MessageBody>& toSend, const Or
  */
 void buildLocalTree(BHCell* root, const std::vector<Body>& bodies) {
     for (int i = 0; i < bodies.size(); ++i) {
-        addBody(root, bodies[i]);
+        addBodyToBHTree(root, bodies[i]);
     }
 }
 
@@ -905,7 +892,7 @@ void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, const std::vector
     Body child;
     for (int i = 0; i < toAdd.size(); ++i) {
         child =  Body(toAdd[i]);
-        addBody(root, child);
+        addBodyToBHTree(root, child);
     }
 }
 
