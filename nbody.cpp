@@ -172,6 +172,11 @@ std::vector<int> getBinary(int number) {
     int size_Of_Cluster;
     MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
 
+    if(size_Of_Cluster == 1) {
+        binary.push_back(0);
+        return binary;
+    }
+
     if(number != 0) {
         while(number > 0) {
             binary.push_back(number % 2);
@@ -225,12 +230,12 @@ int getProcessorWorldRank(int numProcessor, MPI_Group processorGroup) {
     return worldRank;
 }
 
+//Checks if processor is left of ORB split
 bool isLeftOfSplit(int bit) {
     int process_Rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
     std::vector<int> binary = getBinary(process_Rank);
 
-    //This check is taken from salmon
     if(binary[bit] ^ 1) {
         return true;
     }
@@ -889,15 +894,20 @@ void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, const std::vector
         receiveData(neighborRank, toAdd);
     }
 
-    Body child;
     for (int i = 0; i < toAdd.size(); ++i) {
-        child =  Body(toAdd[i]);
-        addBodyToBHTree(root, child);
+        addBodyToBHTree(root, Body(toAdd[i]));
     }
 }
 
 void computeCellForce(Body& body, double x, double y, double mass) {
     double dist = computeDistance(body.x, body.y, x, y);
+    //because I do not have collisions it is possible fro two bodies to
+    //have the exact same positions which leads to a segmentation fault
+    //and NaN issues
+    if (dist == 0) {
+        dist = 0.00001;
+    }
+
     double force = GRAVITY * (body.mass * mass) / pow(dist, 2.0);
 
     //force direction
@@ -1055,7 +1065,6 @@ void buildLocallyEssentialTree(const OrbTree& rootORB) {
     MPI_Comm_rank(MPI_COMM_WORLD, &process_Rank);
 
     start = std::chrono::high_resolution_clock::now();
-    std::cout << "SIZE " << myBodies.size() << " rank:" << process_Rank << std::endl;
 
     for (int i = 0; i < myBodies.size(); ++i) {
         myBodies[i].weight = 0;
