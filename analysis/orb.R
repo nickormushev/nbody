@@ -72,4 +72,32 @@ p <- p + annotate("segment",
              yend = 1000000,
              size = 1.5, alpha = 0.7)
 
+p <- p + annotate("segment",
+             x = 0,
+             y = 0,
+             xend = 0,
+             yend = 1000000,
+             size = 1.5, alpha = 0.7)
+
+p <- p + annotate("segment",
+             x = 0,
+             y = 0,
+             xend = 1000000,
+             yend = 0,
+             size = 1.5, alpha = 0.7)
+
+p <- p + annotate("segment",
+             x = 1000000,
+             y = 0,
+             xend = 1000000,
+             yend = 1000000,
+             size = 1.5, alpha = 0.7)
+
+p <- p + annotate("segment",
+             x = 0,
+             y = 1000000,
+             xend = 1000000,
+             yend = 1000000,
+             size = 1.5, alpha = 0.7)
+
 ggsave("./orb.png")

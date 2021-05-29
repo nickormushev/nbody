@@ -50,9 +50,11 @@ calculation_time <- read.csv("./1mil/data/calculations1mil.csv")
 iterations <- 10
 
 max_calc_time <- data.frame(numProc = numeric(), calcTime = numeric())
+colnames(calculation_time)
 
 for (numProc in c(1, 2, 4, 8, 16, 32)) {
     calc_i <- calculation_time[calculation_time$numProc == numProc, ]
+    calc_i
 
     #create a matrx where every row are the times
     #for each processor during a  different iteration
@@ -101,3 +103,38 @@ graphic(max_calc_time, "Брой процеси", "Ефективност",
         "Ефективност на изчеслиението на на взаимодействията между 1 милион тела")
 
 ggsave("1milCalcEfficency.png")
+
+
+#Barplot for calculations work per processor
+calc16 <- calculation_time[calculation_time$numProc == 16, ]
+colnames(calc16)
+
+
+processor_avg <- matrix(nrow = 16, ncol = 3)
+
+for (i in c(1, 2, 3)) {
+    it <- calc16[calc16$iteration == i, ]
+    for (id in seq(0, 15)) {
+       processor_avg[id + 1, i] <- mean(it[it$id == id, ]$time)
+    }
+}
+
+mean_per_processor <- apply(processor_avg, 1, mean, na.rm = T)
+
+processor_avg <- data.frame(
+    processor_id = seq(1, 16),
+    avg_time = mean_per_processor
+)
+
+options(scipen = 999)
+#barplot(t(as.matrix(processor_avg)), ylab = "Време в микросекунди", besides = T)
+
+p <- ggplot(data = processor_avg,
+            aes(x = as.factor(processor_id), y = avg_time)) +
+    geom_bar(stat = "identity", fill = "steelblue") +
+    geom_text(aes(label = round(avg_time)), vjust = 1.6,
+              color = "white", size = 3.5) +
+    xlab("Идентификатор на процесора") +
+    ylab("Време прекарано в смятане на взаимодействия между телата")
+
+ggsave("./1mil/png/timeSpentInCalculationsPerProcessor.png")
