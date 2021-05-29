@@ -43,7 +43,7 @@ mean_time_per_proc
 graphic(mean_time_per_proc, "Брой процеси", "Време в микросекунди",
     "Цялостно време за изпълнение на програмата с 1 милион тела")
 
-ggsave("./1milTime.png")
+ggsave("./1mil/png/1milTime.png", width = 9)
 
 calculation_time <- read.csv("./1mil/data/calculations1mil.csv")
 
@@ -68,7 +68,7 @@ for (numProc in c(1, 2, 4, 8, 16, 32)) {
 graphic(max_calc_time, "Брой процеси", "Време в микросекунди",
         "Време за изчисление на взаимодействията между 1 милион тела")
 
-ggsave("1milCalcTime.png")
+ggsave("./1mil/png/1milCalcTime.png", width = 9)
 
 
 #Speedup calculation_time for one process/ calculation_time for n processes
@@ -79,7 +79,7 @@ graphic(max_calc_time, "Брой процеси", "Ускорение",
     "Ускорение на скоростта за изчисление на взаимодействията между 1 милион тела")
         
 
-ggsave("1milCalcTimeSpeedup.png")
+ggsave("./1mil/png/1milCalcTimeSpeedup.png", width = 9)
 
 mean_time_per_proc$calcTime <- mean_time_per_proc[mean_time_per_proc$numProc == 1, ]$calcTime / mean_time_per_proc$calcTime
 
@@ -87,7 +87,7 @@ mean_time_per_proc$calcTime <- mean_time_per_proc[mean_time_per_proc$numProc == 
 graphic(mean_time_per_proc, "Брой процеси", "Ускорение",
         "Ускорени на цялостното време за работа при 1 милион тела")
 
-ggsave("1milTotalTimeSpeedup.png")
+ggsave("./1mil/png/1milTotalTimeSpeedup.png", width = 9)
 
 #Efficency speedup/number of processes
 mean_time_per_proc$calcTime <- mean_time_per_proc$calcTime / mean_time_per_proc$numProc
@@ -95,14 +95,14 @@ mean_time_per_proc$calcTime <- mean_time_per_proc$calcTime / mean_time_per_proc$
 graphic(mean_time_per_proc, "Брой процеси", "Ефективност",
         "Ефективност на цялото време за работа при 1 милион тела")
 
-ggsave("1milTotalTimeEfficency.png")
+ggsave("./1mil/png/1milTotalTimeEfficency.png", width = 9)
 
 max_calc_time$calcTime  <- max_calc_time$calcTime / max_calc_time$numProc
 
 graphic(max_calc_time, "Брой процеси", "Ефективност",
         "Ефективност на изчеслиението на на взаимодействията между 1 милион тела")
 
-ggsave("1milCalcEfficency.png")
+ggsave("./1mil/png/1milCalcEfficency.png", width = 9)
 
 
 #Barplot for calculations work per processor
@@ -127,7 +127,6 @@ processor_avg <- data.frame(
 )
 
 options(scipen = 999)
-#barplot(t(as.matrix(processor_avg)), ylab = "Време в микросекунди", besides = T)
 
 p <- ggplot(data = processor_avg,
             aes(x = as.factor(processor_id), y = avg_time)) +
@@ -135,6 +134,9 @@ p <- ggplot(data = processor_avg,
     geom_text(aes(label = round(avg_time)), vjust = 1.6,
               color = "white", size = 3.5) +
     xlab("Идентификатор на процесора") +
-    ylab("Време прекарано в смятане на взаимодействия между телата")
+    ggtitle("Време прекарано в смятане на взаимодействия между телата") +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    ylab("Време")
+p
 
-ggsave("./1mil/png/timeSpentInCalculationsPerProcessor.png")
+ggsave("./1mil/png/timeSpentInCalculationsPerProcessor.png", width = 10, height = 7)
