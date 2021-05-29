@@ -1,0 +1,209 @@
+309037 time to find ORB split
+309037 time to find ORB split
+628226 Local tree build and local splits get time
+624098 Local tree build and local splits get time
+49291  Time for tree metrics recalculation
+50253  Time for tree metrics recalculation
+24759 find toSend
+25589 find toSend
+229547  exchange bodies
+235088  exchange bodies
+311163 TIME Locally Essential For
+SIZE 999995 rank:1
+311275 TIME Locally Essential For
+SIZE 1000005 rank:0
+11340881 Calculations time
+14140528 Calculations time
+15115196 Build locally essential tree time
+15103898 Build locally essential tree time
+38052 time for synchronization of processor bodies
+38455 time for synchronization of processor bodies
+6319 ORB build time
+6319 ORB build time
+616607 Local tree build and local splits get time
+620619 Local tree build and local splits get time
+29654  Time for tree metrics recalculation
+29969  Time for tree metrics recalculation
+23964 find toSend
+23955 find toSend
+231526  exchange bodies
+234222  exchange bodies
+288315 TIME Locally Essential For
+SIZE 1000005 rank:0
+288313 TIME Locally Essential For
+SIZE 999995 rank:1
+11276258 Calculations time
+14159879 Calculations time
+15094614 Build locally essential tree time
+15097101 Build locally essential tree time
+37957 time for synchronization of processor bodies
+38816 time for synchronization of processor bodies
+6380 ORB build time
+6380 ORB build time
+608848 Local tree build and local splits get time
+611986 Local tree build and local splits get time
+30696  Time for tree metrics recalculation
+30961  Time for tree metrics recalculation
+24090 find toSend
+24519 find toSend
+229804  exchange bodies
+287351 TIME Locally Essential For
+SIZE 1000005 rank:0
+231764  exchange bodies
+287362 TIME Locally Essential For
+SIZE 999995 rank:1
+11382844 Calculations time
+14308147 Calculations time
+15233007 Build locally essential tree time
+15233413 Build locally essential tree time
+37151 time for synchronization of processor bodies
+37456 time for synchronization of processor bodies
+6181 ORB build time
+6180 ORB build time
+607501 Local tree build and local splits get time
+612115 Local tree build and local splits get time
+29330  Time for tree metrics recalculation
+29583  Time for tree metrics recalculation
+23265 find toSend
+23447 find toSend
+225982  exchange bodies
+283287 TIME Locally Essential For
+SIZE 999995 rank:1
+230152  exchange bodies
+283298 TIME Locally Essential For
+SIZE 1000005 rank:0
+11194633 Calculations time
+14068766 Calculations time
+14989052 Build locally essential tree time
+14992353 Build locally essential tree time
+35773 time for synchronization of processor bodies
+36169 time for synchronization of processor bodies
+6235 ORB build time
+6236 ORB build time
+596597 Local tree build and local splits get time
+610832 Local tree build and local splits get time
+29941  Time for tree metrics recalculation
+30268  Time for tree metrics recalculation
+24309 find toSend
+24309 find toSend
+226874  exchange bodies
+284633 TIME Locally Essential For
+SIZE 999995 rank:1
+229914  exchange bodies
+284631 TIME Locally Essential For
+SIZE 1000005 rank:0
+11193598 Calculations time
+14138693 Calculations time
+15044288 Build locally essential tree time
+15059575 Build locally essential tree time
+38620 time for synchronization of processor bodies
+38873 time for synchronization of processor bodies
+6479 ORB build time
+6473 ORB build time
+603522 Local tree build and local splits get time
+631913 Local tree build and local splits get time
+29777  Time for tree metrics recalculation
+30029  Time for tree metrics recalculation
+22959 find toSend
+23260 find toSend
+231052  exchange bodies
+285052 TIME Locally Essential For
+SIZE 1000005 rank:0
+231631  exchange bodies
+285069 TIME Locally Essential For
+SIZE 999995 rank:1
+11304718 Calculations time
+14224567 Calculations time
+15168253 Build locally essential tree time
+15171133 Build locally essential tree time
+37060 time for synchronization of processor bodies
+37437 time for synchronization of processor bodies
+7216 ORB build time
+7216 ORB build time
+618728 Local tree build and local splits get time
+620231 Local tree build and local splits get time
+29370  Time for tree metrics recalculation
+29701  Time for tree metrics recalculation
+24781 find toSend
+24734 find toSend
+225927  exchange bodies
+230407  exchange bodies
+284993 TIME Locally Essential For
+284993 TIME Locally Essential For
+SIZE 1000005 rank:0
+SIZE 999995 rank:1
+11123769 Calculations time
+14112906 Calculations time
+15043904 Build locally essential tree time
+15046287 Build locally essential tree time
+36729 time for synchronization of processor bodies
+37128 time for synchronization of processor bodies
+6319 ORB build time
+6319 ORB build time
+598880 Local tree build and local splits get time
+607496 Local tree build and local splits get time
+29923  Time for tree metrics recalculation
+30188  Time for tree metrics recalculation
+24411 find toSend
+24391 find toSend
+230245  exchange bodies
+285478 TIME Locally Essential For
+SIZE 999995 rank:1
+230735  exchange bodies
+285478 TIME Locally Essential For
+SIZE 1000005 rank:0
+GOTCHA zero dist 
+11297091 Calculations time
+14172818 Calculations time
+15093332 Build locally essential tree time
+15095434 Build locally essential tree time
+36849 time for synchronization of processor bodies
+37245 time for synchronization of processor bodies
+6441 ORB build time
+6436 ORB build time
+601625 Local tree build and local splits get time
+614572 Local tree build and local splits get time
+29796  Time for tree metrics recalculation
+30060  Time for tree metrics recalculation
+23758 find toSend
+24165 find toSend
+226259  exchange bodies
+234286  exchange bodies
+288631 TIME Locally Essential For
+SIZE 1000005 rank:0
+288632 TIME Locally Essential For
+SIZE 999995 rank:1
+11418822 Calculations time
+14312166 Calculations time
+15242828 Build locally essential tree time
+15245688 Build locally essential tree time
+38072 time for synchronization of processor bodies
+38415 time for synchronization of processor bodies
+6625 ORB build time
+6625 ORB build time
+610166 Local tree build and local splits get time
+623644 Local tree build and local splits get time
+29532  Time for tree metrics recalculation
+29767  Time for tree metrics recalculation
+25614 find toSend
+26080 find toSend
+227004  exchange bodies
+234890  exchange bodies
+290850 TIME Locally Essential For
+SIZE 1000005 rank:0
+290852 TIME Locally Essential For
+SIZE 999995 rank:1
+11483831 Calculations time
+14435877 Calculations time
+15376872 Build locally essential tree time
+15379433 Build locally essential tree time
+37008 time for synchronization of processor bodies
+37432 time for synchronization of processor bodies
+6440 ORB build time
+152273285 Total time
+Orb total: 64635
+Essential total: 2889874
+6438 ORB build time
+152273287 Total time
+Orb total: 64622
+Essential total: 2889782
