@@ -923,10 +923,12 @@ void computeForces(BHCell* node, Body& body) {
     }
 
     if(node->isLeaf) {
-        Body other = node->bodies[0];
-        if(other.id != body.id) {
-            computeCellForce(body, other.x, other.y, other.mass);
-            body.weight++;
+        for (int i = 0; i < node->bodies.size(); ++i) {
+            Body other = node->bodies[i];
+            if(other.id != body.id) {
+                computeCellForce(body, other.x, other.y, other.mass);
+                body.weight++;
+            }
         }
     } else {
         double dist = computeDistance(body.x, body.y, node->cmass_x, node->cmass_y);
