@@ -8,15 +8,16 @@
 #include <chrono>
 #include <fstream>
 
-#define spaceX 1.0e8        		      //the maximum x cordinate of space
-#define spaceY 1.0e8       		          //the maximum y coordinate of space
+#define spaceX 1.0e6        		      //the maximum x cordinate of space
+#define spaceY 1.0e6       		          //the maximum y coordinate of space
 #define bodyCount 5000    		          //how many bodies to simulate
 #define MAX_RADIUS 3        		      //the maximum initial radius
-#define MAX_START_VELOCITY 100      	  //the maximum allowed initial velocity
+#define MAX_START_VELOCITY 6000      	  //the maximum allowed initial velocity
+#define MIN_START_VELOCITY 3000      	  //the minimum allowed initial velocity
 #define MASTER 0            		      //the processor with id 0
 #define TIME 4            		          //how many units of time should we simulate
 #define DELTAT 0.1          		      //one unit of time
-#define ACCURACY 0.2        		      //how accurate are the barnes hut approximations
+#define THETA 0.2        		          //how accurate are the barnes hut approximations. Lower value means more accurate
 #define GRAVITY 6.67300e-11 		      //the gravity constand
 #define MAX_MASS 1.899e20        	      //the maximum mass of the bodies
 #define MIN_MASS 1.899e15        	      //the minimum mass of the bodies
@@ -24,6 +25,7 @@
 #define ORB_SPLIT_ERROR 0.001             //the allowed difference between the workload and 0.5 during ORB
 #define ORB_REBUILD_WEIGHT 5              //the required weight difference between two processors for orb to rebuild
                                           //value between 1 and 100 representing a percentage
+                
 int OrbTotalTime = 0;
 int LocallyEssentialTreeTotalTime = 0; 
 MPI_Datatype TMPIMessageBody;
@@ -809,7 +811,7 @@ double minDistanceToSegment(double x1, double y1, double x2, double y2, double p
 
 /*
  *This criterion detirmines the distance between the 
- *cell and the split and says that if the dist * ACCURACY
+ *cell and the split and says that if the dist * THETA
  *is less than the width or hieght of the cell respectively
  *Then we must calculate the children. So if the criterion
  *is not true we can generalize.
@@ -819,13 +821,13 @@ bool domainCriterion(BHCell* node, const OrbTree& split) {
     if(split.getIsXSplit()) {
         dist = minDistanceToSegment(split.getSplitCoordinate(), split.getMinY(),
             split.getSplitCoordinate(), split.getMaxY(), node->cmass_x, node->cmass_y);
-        return dist * ACCURACY < node->width;
+        return dist * THETA < node->width;
     } 
 
     dist = minDistanceToSegment(split.getMinX(), split.getSplitCoordinate(),
         split.getMaxX(), split.getSplitCoordinate(), node->cmass_x, node->cmass_y);
 
-    return dist * ACCURACY < node->height;
+    return dist * THETA < node->height;
 }
 
 void enqueLeafBodies(std::vector<MessageBody>& toSend, const std::vector<Body>& bodies) {
@@ -951,7 +953,7 @@ void computeForces(BHCell* node, Body& body) {
     } else {
         double dist = computeDistance(body.x, body.y, node->cmass_x, node->cmass_y);
 
-        if(dist * ACCURACY < node->width) {
+        if(dist * THETA < node->width) {
             for (int i = 0; i < 4; ++i) {
                 computeForces(node->subcells[i], body);
             }
@@ -1155,8 +1157,8 @@ void initialize_bodies() {
         newBody.y = 1 + generate_random_double2() * maxY;
         newBody.mass = MIN_MASS + generate_random_double2() * (MAX_MASS - MIN_MASS);
         newBody.radius = generate_random_double() * MAX_RADIUS;
-        newBody.velocityX = 500 + generate_random_double_one_minus_one() * MAX_START_VELOCITY;
-        newBody.velocityY = 500 + generate_random_double_one_minus_one() * MAX_START_VELOCITY;
+        newBody.velocityX = MIN_START_VELOCITY + generate_random_double_one_minus_one() * (MAX_START_VELOCITY - MIN_START_VELOCITY);
+        newBody.velocityY = MIN_START_VELOCITY + generate_random_double_one_minus_one() * (MAX_START_VELOCITY - MIN_START_VELOCITY);
         bodyList.push_back(newBody);
     }
 }
