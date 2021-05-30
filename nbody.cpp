@@ -8,23 +8,22 @@
 #include <chrono>
 #include <fstream>
 
-#define spaceX 1.0e6        		          //the maximum x cordinate of space
-#define spaceY 1.0e6       		              //the maximum y coordinate of space
-#define bodyCount 11001//1600000    		  //how many bodies to simulate
-#define MAX_RADIUS 3        		          //the maximum initial radius
-#define MAX_START_VELOCITY 1000      		  //the maximum allowed initial velocity
-#define MASTER 0            		          //the processor with id 0
-#define TIME 1000            		          //how many units of time should we simulate
-#define DELTAT 0.1          		          //one unit of time
-#define ACCURACY 0.2        		          //how accurate are the barnes hut approximations
-#define GRAVITY 6.67300e-11 		          //the gravity constand
-#define MAX_MASS 1.899e19        		      //the maximum mass of the bodies
-#define BODIES_PER_LEAF 3 * bodyCount/100     //the amount of bodies stored in a barnes hut tree leaf
-#define ORB_SPLIT_ERROR 0.01                  //the allowed difference between the workload and 0.5 during ORB
-#define ORB_REBUILD_WEIGHT 5                  //the required work difference between a processors and
-                                              //the average so the ORB tree is rebuilt. It should be a a 
-                                              //value between 1 and 100 representing a percentage
-
+#define spaceX 1.0e8        		      //the maximum x cordinate of space
+#define spaceY 1.0e8       		          //the maximum y coordinate of space
+#define bodyCount 5000    		          //how many bodies to simulate
+#define MAX_RADIUS 3        		      //the maximum initial radius
+#define MAX_START_VELOCITY 100      	  //the maximum allowed initial velocity
+#define MASTER 0            		      //the processor with id 0
+#define TIME 4            		          //how many units of time should we simulate
+#define DELTAT 0.1          		      //one unit of time
+#define ACCURACY 0.2        		      //how accurate are the barnes hut approximations
+#define GRAVITY 6.67300e-11 		      //the gravity constand
+#define MAX_MASS 1.899e20        	      //the maximum mass of the bodies
+#define MIN_MASS 1.899e15        	      //the minimum mass of the bodies
+#define BODIES_PER_LEAF 100               //the amount of bodies stored in a barnes hut tree leaf
+#define ORB_SPLIT_ERROR 0.001             //the allowed difference between the workload and 0.5 during ORB
+#define ORB_REBUILD_WEIGHT 5              //the required weight difference between two processors for orb to rebuild
+                                          //value between 1 and 100 representing a percentage
 int OrbTotalTime = 0;
 int LocallyEssentialTreeTotalTime = 0; 
 MPI_Datatype TMPIMessageBody;
@@ -53,12 +52,13 @@ struct MessageBody {
 
 MPI_Datatype TMPIBody;
 struct Body {
-    int id, weight;
+    int id;
+    long weight;
     double x, y;
     double velocityX, velocityY, radius, mass;
     double forceX, forceY;
 
-    void copy(int id, int weight, double x, double y, double velocityX, double velocityY,
+    void copy(int id, long weight, double x, double y, double velocityX, double velocityY,
             double radius, double mass, double forceX, double forceY) {
        this->x = x;
        this->y = y;
@@ -77,6 +77,10 @@ struct Body {
     
     Body(MessageBody o) {
         copy(0, 0, o.x, o.y, 0, 0, 0, o.mass, 0, 0);
+    }
+
+    Body(const Body& o) {
+        copy(o.id, o.weight, o.x, o.y, o.velocityX, o.velocityY, o.radius, o.mass, o.forceX, o.forceY);
     }
 };
 
@@ -126,8 +130,8 @@ std::vector<Body> bodyList;
 std::vector<Body> myBodies;
 std::vector<Body> myNewBodies;
 
-int getMyBodiesWeight() {
-    int weightSum = 0;
+long getMyBodiesWeight() {
+    long weightSum = 0;
     for (int i = 0; i < myBodies.size(); ++i) {
         weightSum += myBodies[i].weight;
     }
@@ -142,11 +146,11 @@ void printMyBodiesWeight(int process_Rank) {
 bool shouldRebuildORB() {
     int size_Of_Cluster;
     MPI_Comm_size(MPI_COMM_WORLD, &size_Of_Cluster);
-    int bodyCountForProcessor[size_Of_Cluster];
-    int myBodiesWeight = getMyBodiesWeight();
+    long bodyCountForProcessor[size_Of_Cluster];
+    long myBodiesWeight = getMyBodiesWeight();
     double globalAvg = 0;
 
-    MPI_Allgather(&myBodiesWeight, 1, MPI_INT, bodyCountForProcessor, 1, MPI_INT, MPI_COMM_WORLD);
+    MPI_Allgather(&myBodiesWeight, 1, MPI_LONG, bodyCountForProcessor, 1, MPI_LONG, MPI_COMM_WORLD);
 
     for(int i = 0; i < size_Of_Cluster; i++) {
         globalAvg += bodyCountForProcessor[i];
@@ -315,8 +319,8 @@ struct BHCell {
     }
 
     BHCell(const BHCell& other) {
-        this->copy(other.x, other.y, other.width, other.height, other.isLeaf,
-                other.mass, other.cmass_x, other.cmass_x, other.bodies, other.subcells);
+	    this->copy(other.x, other.y, other.width, other.height, other.isLeaf,
+            other.mass, other.cmass_x, other.cmass_x, other.bodies, other.subcells);
     }
 
     BHCell& operator=(const BHCell &other) {
@@ -335,7 +339,7 @@ struct BHCell {
 
     void calculateMetrics() {
 	    if(this->bodies.size() <= BODIES_PER_LEAF) {
-	    	return;
+	        return;
 	    }
 
     	int process_Rank;
@@ -416,10 +420,10 @@ class OrbTree {
     //returns the ratio of the work done above
     //the split compared to the whole work
     double checkSplit(double split) {
-        int workAbove = 0;
-        int workBelow = 0;
-        int globalWorkAbove = 0;
-        int globalWorkBelow = 0;
+        long workAbove = 0;
+        long workBelow = 0;
+        long globalWorkAbove = 0;
+        long globalWorkBelow = 0;
 
         for (int i = 0; i < myBodies.size(); ++i) {
             if(is_above(myBodies[i], split, minX, minY, maxX, maxY, isXSplit)) {
@@ -429,8 +433,8 @@ class OrbTree {
             }
         }
 
-        MPI_Allreduce(&workAbove, &globalWorkAbove, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(&workBelow, &globalWorkBelow, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&workAbove, &globalWorkAbove, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&workBelow, &globalWorkBelow, 1, MPI_LONG, MPI_SUM, MPI_COMM_WORLD);
 
         return (double)globalWorkAbove/(globalWorkBelow + globalWorkAbove);
     }
@@ -448,7 +452,7 @@ class OrbTree {
 
         //It is possible to enter an endless loop here. Where the accurasy
         //is just not close enough and for that reason I added a loopDetector
-        while (std::abs(workRatio - 0.5) > ORB_SPLIT_ERROR && loopDetector < 100) {
+        while (std::abs(workRatio - 0.5) > ORB_SPLIT_ERROR && loopDetector < 300) {
             //Move the split coordinate up or down based on the workRatio
             //if the workRatio is greater than 0.5 it means that we need to 
             //move upward so less bodies are above the split and vice verca
@@ -462,7 +466,7 @@ class OrbTree {
 
             //Make the step smaller with time so we can get closer to the
             //desired workRatio. 
-            if (i % 10 == 0 && step >= (double)1/pow(10, 3)) {
+            if (i % 10 == 0 && step >= (double)1/pow(10, 4)) {
                 step = step / 10;
             }
 
@@ -731,6 +735,7 @@ std::vector<OrbTree> getMySplits(const OrbTree* root)  {
     const OrbTree* current = root;
     bool processorLeftOfSplit;
 
+
     while(current != nullptr) {
         processorLeftOfSplit = isLeftOfSplit(current->getBit());
         if (processorLeftOfSplit && current->getLeft() != nullptr) {
@@ -859,21 +864,36 @@ void buildLocalTree(BHCell* root, const std::vector<Body>& bodies) {
     }
 }
 
+//Receives essential bodies from neighbor processor
 void receiveData(int neighborRank, std::vector<MessageBody>& toAdd) {
 
     MPI_Status stat;
-    MPI_Probe(neighborRank, 0, MPI_COMM_WORLD, &stat);
+    if (MPI_Probe(neighborRank, 0, MPI_COMM_WORLD, &stat) != MPI_SUCCESS) {
+        std::cout << "Failed to probe neighbor before receiving message bodies" << std::endl;
+        exit(3);
+    }
 
     int cnt;
-    MPI_Get_count(&stat, TMPIMessageBody, &cnt);
+    if (MPI_Get_count(&stat, TMPIMessageBody, &cnt) != MPI_SUCCESS) {
+        std::cout << "Failed to get MessageBody count from to"
+                  << "receive data neighbor. Invalid data type" << std::endl;
+        exit(4);
+    }
 
     toAdd.resize(cnt);
-    MPI_Recv(toAdd.data(), cnt, TMPIMessageBody,
-            neighborRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    if (MPI_Recv(toAdd.data(), cnt, TMPIMessageBody,
+            neighborRank, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE) != MPI_SUCCESS) {
+        std::cout << "Failed to receive data from neighbor" << std::endl;
+        exit(2);
+    }
 }
 
+//Sends essential bodies to neighbor processor
 void sendData(int neighborRank, const std::vector<MessageBody>& toSend) {
-    MPI_Send(toSend.data(), toSend.size(), TMPIMessageBody, neighborRank, 0, MPI_COMM_WORLD);
+    if (MPI_Send(toSend.data(), toSend.size(), TMPIMessageBody, neighborRank, 0, MPI_COMM_WORLD) != MPI_SUCCESS) {
+        std::cout << "Failed to send data to neighbor" << std::endl;
+        exit(1);
+    }
 }
 
 /*
@@ -901,14 +921,12 @@ void exchangeNodesAndMerge(bool leftOfSplit, int neighborRank, const std::vector
 
 void computeCellForce(Body& body, double x, double y, double mass) {
     double dist = computeDistance(body.x, body.y, x, y);
-    //because I do not have collisions it is possible fro two bodies to
+    //Because I do not have collisions it is possible fro two bodies to
     //have the exact same positions which leads to a segmentation fault
-    //and NaN issues
-    if (dist == 0) {
-        dist = 0.00001;
-    }
+    //and NaN issues. This is called a softening which avoids a zero dist
+    dist += 0.00001;
 
-    double force = GRAVITY * (body.mass * mass) / pow(dist, 2.0);
+    double force = GRAVITY * (body.mass * mass) / dist;
 
     //force direction
     body.forceX += force * ((x - body.x) / dist);
@@ -923,13 +941,13 @@ void computeForces(BHCell* node, Body& body) {
     }
 
     if(node->isLeaf) {
-        for (int i = 0; i < node->bodies.size(); ++i) {
+	    for(int i = 0; i < node->bodies.size(); i++) {
             Body other = node->bodies[i];
             if(other.id != body.id) {
                 computeCellForce(body, other.x, other.y, other.mass);
-                body.weight++;
+       	        body.weight++;
             }
-        }
+	    }
     } else {
         double dist = computeDistance(body.x, body.y, node->cmass_x, node->cmass_y);
 
@@ -1028,6 +1046,7 @@ void buildLocallyEssentialTree(const OrbTree& rootORB) {
     bool leftOfSplit;
     int neighborRank;
 
+
     auto start = std::chrono::high_resolution_clock::now();
 
     buildLocalTree(&rootBH, myBodies);
@@ -1036,18 +1055,17 @@ void buildLocallyEssentialTree(const OrbTree& rootORB) {
     logTime(start, "Local tree build and local splits get time");
 
     auto startFor = std::chrono::high_resolution_clock::now();
-    //-1 because the last split contains only our area
     rootBH.calculateMetrics();
+    //-1 because the last split contains only our area
     for (int i = 0; i < splits.size() - 1; ++i) {
         std::vector<MessageBody> toSend;
-        start = std::chrono::high_resolution_clock::now();
 
+        start = std::chrono::high_resolution_clock::now();
         //find nodes that might be essential to processors on the other
         //side of the split and add them to the toSend vector
         findEssentialNodes(&rootBH, toSend, splits[i]);
         leftOfSplit = isLeftOfSplit(splits[i].getBit());
         neighborRank = getNeighborFromBit(splits[i].getBit());
-
         logTime(start, "find toSend");
 
         start = std::chrono::high_resolution_clock::now();
@@ -1078,7 +1096,7 @@ void buildLocallyEssentialTree(const OrbTree& rootORB) {
     computeVelocity();
     updatePositions();
 
-    logTime(start, "Calculations time");
+    logTime(start, std::to_string(process_Rank) + " Calculations time");
 }
 
 void runSimulation(OrbTree& root) {
@@ -1096,7 +1114,6 @@ void runSimulation(OrbTree& root) {
         synchronizeBodies();
         logTime(start, "time for synchronization of processor bodies");
 
-        MPI_Barrier(MPI_COMM_WORLD);
         if(process_Rank == MASTER) {
             saveBodyListCoordinatesToFile(0, i);
         }
@@ -1106,12 +1123,9 @@ void runSimulation(OrbTree& root) {
             myNewBodies.clear();
             root = OrbTree(MPI_COMM_WORLD, 0, 0, spaceX, spaceY);
             root.split();
-
-            myBodies.clear();
-            myBodies.insert(myBodies.begin(), myNewBodies.begin(), myNewBodies.end());
+	        myBodies = myNewBodies;
         }
 
-        //printMyBodiesWeight(process_Rank);
         logTime(start, "ORB build time", "ORB");
     }
 }
@@ -1139,7 +1153,7 @@ void initialize_bodies() {
         newBody.weight = 1;
         newBody.x = 1 + generate_random_double2() * maxX;
         newBody.y = 1 + generate_random_double2() * maxY;
-        newBody.mass = 1.899e6 + generate_random_double2() * (MAX_MASS - 1.899e6);
+        newBody.mass = MIN_MASS + generate_random_double2() * (MAX_MASS - MIN_MASS);
         newBody.radius = generate_random_double() * MAX_RADIUS;
         newBody.velocityX = 500 + generate_random_double_one_minus_one() * MAX_START_VELOCITY;
         newBody.velocityY = 500 + generate_random_double_one_minus_one() * MAX_START_VELOCITY;
@@ -1155,11 +1169,11 @@ void printBodyListId(int process_Rank) {
 
 void buildTypes() {
     //Body type used for transimitting the body structure
-    MPI_Aint displacements[2] = {offsetof(Body, id), offsetof(Body, x)};
-    int block_lengths[2] = {2, 8};
-    MPI_Datatype types[2] = {MPI_INT, MPI_DOUBLE};
+    MPI_Aint displacements[3] = {offsetof(Body, id), offsetof(Body, weight), offsetof(Body, x)};
+    int block_lengths[3] = {1, 1, 8};
+    MPI_Datatype types[3] = {MPI_INT, MPI_LONG, MPI_DOUBLE};
 
-    MPI_Type_create_struct(2, block_lengths, displacements, types, &TMPIBody); 
+    MPI_Type_create_struct(3, block_lengths, displacements, types, &TMPIBody); 
     MPI_Type_commit(&TMPIBody);
 
     //Create message body type for MPI
@@ -1231,3 +1245,4 @@ int main(int argc, char *argv[]) {
     return 0;
 
 }
+
