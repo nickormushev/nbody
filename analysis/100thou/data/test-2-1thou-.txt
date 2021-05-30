@@ -1,0 +1,15 @@
+LOOOOOOP 1
+651 time to find ORB split
+1 SIZE 2
+576 time to find ORB split
+1 SIZE 2
+0HERE 1HERE 45651 Local tree build and local splits get time
+0HERE 1HERE 45552 Local tree build and local splits get time
+1566 find toSend
+1561 find toSend
+17491  exchange bodies
+19158  exchange bodies
+3425  Time for tree metrics recalculation
+26727 TIME Locally Essential For
+3417  Time for tree metrics recalculation
+26719 TIME Locally Essential For
