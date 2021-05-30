@@ -8,7 +8,7 @@ library(png)
 theme_set(theme_bw())
 options(browser = "chromium")
 
-coords <- read.csv("./test.csv")
+coords <- read.csv("/home/nikolay/FMI/SPO/nbody/animation/coordinates.csv")
 colnames(coords)
 
 p <- ggplot(
@@ -24,4 +24,4 @@ ani <- p + transition_time(iteration) +
     labs(title = "iteration: {frame_time}");
 
 animate(ani, duration = 10, fps = 24,
-        renderer = gifski_renderer("test.gif"), height = 1200, width = 1200)
+        renderer = gifski_renderer("hope.gif"), height = 1200, width = 1200)
