@@ -20,18 +20,22 @@ total_time <- read.csv("./200thou/data/totalTime200thou.csv")
 mean_time_per_proc <- data.frame(numProc = numeric(), calcTime = numeric())
 names(mean_time_per_proc)
 
-#sum the min total time for each attempt and then take the mean
+#gets the max time for the processors and
+#then the min total time for each attempt
 for (numProc in c(1, 2, 4, 8, 16, 32)) {
-    sum_time <- 0
-    for (i in c(1, 2, 3)) {
-       sum_time <- sum_time + min(
+    min_time <- max(
+        total_time[total_time$processorCount == numProc &
+        total_time$iteration == 1, ]$time)
+
+    for (i in c(2, 3)) {
+       min_time <- min(min_time, max(
                 total_time[total_time$processorCount == numProc &
-                total_time$iteration == i, ]$time
+                total_time$iteration == i, ]$time)
        )
     }
 
     mean_time_per_proc[nrow(mean_time_per_proc) + 1, ] <-
-        c(numProc, sum_time / 3)
+        c(numProc, min_time)
 }
 
 mean_time_per_proc
@@ -50,34 +54,46 @@ colnames(calculation_time)
 
 #take the m
 for (numProc in c(1, 2, 4, 8, 16, 32)) {
-    calc_i <- calculation_time[calculation_time$numProc == numProc, ]
-    calc_i
+    max_times <- c()
 
-    #create a matrx where every row are the times
-    #for each processor during a  different iteration
-    m <- matrix(calc_i$time, iterations, numProc)
+    for (i in c(1, 2, 3)) {
+        calc_i <- calculation_time[calculation_time$numProc == numProc &
+                                   calculation_time$iteration == i, ]
 
-    #Takes the max time for an iteration
-    min_times <- apply(m, 1, min, na.rm = T)
-    min_calc_time[nrow(min_calc_time) + 1, ] <- c(numProc, mean(min_times))
+        #create a matrx where every row are the times
+        #for each processor during a  different iteration
+        m <- matrix(calc_i$time, iterations, numProc)
+
+        #Takes the max time for a processor during a single unit of time
+        max_times_for_attempt <- apply(m, 1, max, na.rm = T)
+        #Takes the sum of the units of time
+        max_times[i] <- sum(max_times_for_attempt)
+    }
+
+    max_times
+
+    min_calc_time[nrow(min_calc_time) + 1, ] <- c(numProc, min(max_times))
 }
+min_calc_time
+mean_time_per_proc
 
-graphic(min_calc_time, "Брой процеси", "Време в микросекунди",
-        "Време за изчисление на взаимодействията между 200 хиляди тела")
+overhead_vs_calc_time <- rbind(min_calc_time, mean_time_per_proc)
 
-ggsave("./200thou/png/200thouCalcTime.png", width = 9)
+overhead_vs_calc_time$cat <- c(rep("изчисление", 6), rep("изчисление плюс комуникация", 6))
+
+ggplot(overhead_vs_calc_time, aes(x = numProc, y = calcTime, group = cat, col = cat)) +
+   geom_point() +
+   geom_line() +
+   scale_y_continuous(labels = comma) +
+   ggtitle("Времето за изчисление срещу времето за изчисление и комуникация при 200 хиляди тела") +
+   theme(plot.title = element_text(hjust = 0.5)) +
+   xlab("Брой процесори") +
+   ylab("Време в микросекунди")
+
+ggsave("./200thou/png/200thouCalcVsTotalTime.png", width = 10)
 
 
 #Speedup calculation_time for one process/ calculation_time for n processes
-min_calc_time$calcTime  <- min_calc_time[min_calc_time$numProc == 1, ]$calcTime / min_calc_time$calcTime
-
-
-graphic(min_calc_time, "Брой процеси", "Ускорение",
-    "Ускорение на скоростта за изчисление на взаимодействията между 200 хиляди тела")
-        
-
-ggsave("./200thou/png/200thouCalcTimeSpeedup.png", width = 9)
-
 mean_time_per_proc$calcTime <- mean_time_per_proc[mean_time_per_proc$numProc == 1, ]$calcTime / mean_time_per_proc$calcTime
 
 graphic(mean_time_per_proc, "Брой процеси", "Ускорение",
@@ -93,27 +109,21 @@ graphic(mean_time_per_proc, "Брой процеси", "Ефективност",
 
 ggsave("./200thou/png/200thouTotalTimeEfficency.png", width = 9)
 
-min_calc_time$calcTime  <- min_calc_time$calcTime / min_calc_time$numProc
-
-graphic(min_calc_time, "Брой процеси", "Ефективност",
-        "Ефективност на изчеслиението на на взаимодействията между 1 милион тела")
-
-ggsave("./200thou/png/200thouCalcEfficency.png", width = 9)
-
-
 #Barplot for calculations work per processor
 calc16 <- calculation_time[calculation_time$numProc == 16, ]
 colnames(calc16)
 
 processor_avg <- matrix(nrow = 16, ncol = 3)
 
+#Взимаме колко е работил всеки процесор през всяка итерация
 for (i in c(1, 2, 3)) {
     it <- calc16[calc16$iteration == i, ]
     for (id in seq(0, 15)) {
-       processor_avg[id + 1, i] <- mean(it[it$id == id, ]$time)
+       processor_avg[id + 1, i] <- sum(it[it$id == id, ]$time)
     }
 }
 
+#Средно колко е работил процесора на итерация
 mean_per_processor <- apply(processor_avg, 1, mean, na.rm = T)
 
 processor_avg <- data.frame(
@@ -134,4 +144,4 @@ p <- ggplot(data = processor_avg,
     ylab("Време в миркосекунди")
 p
 
-ggsave("./200thou/png/timeSpentInCalculationsPerProcessor.png", width = 11, height = 7)
+ggsave("./200thou/png/timeSpentInCalculationsPerProcessor.png", width = 13, height = 7)
