@@ -1,0 +1,48 @@
+0HERE 671329 Local tree build and local splits get time
+24251 TIME Locally Essential For
+173767372 0 Calculations time
+END 14904240659
+174503122 Build locally essential tree time
+18361 time for synchronization of processor bodies
+
+AFTER 500000 32239 500000 14904240659
+6590 ORB build time
+534706 Local tree build and local splits get time
+22900 TIME Locally Essential For
+178739709 0 Calculations time
+END 14979893621
+179337677 Build locally essential tree time
+18149 time for synchronization of processor bodies
+
+AFTER 500000 32140 500000 14979893621
+6523 ORB build time
+548929 Local tree build and local splits get time
+22544 TIME Locally Essential For
+176736888 0 Calculations time
+END 15018912460
+177350512 Build locally essential tree time
+19854 time for synchronization of processor bodies
+
+AFTER 500000 32041 500000 15018912460
+6845 ORB build time
+576088 Local tree build and local splits get time
+23628 TIME Locally Essential For
+182038015 0 Calculations time
+END 15073311883
+182680175 Build locally essential tree time
+18568 time for synchronization of processor bodies
+
+AFTER 500000 32143 500000 15073311883
+6923 ORB build time
+565423 Local tree build and local splits get time
+22691 TIME Locally Essential For
+187309833 0 Calculations time
+END 14975797116
+187941902 Build locally essential tree time
+18115 time for synchronization of processor bodies
+
+AFTER 500000 31645 500000 14975797116
+6276 ORB build time
+901990346 Total time
+Orb total: 33157
+Essential total: 116014

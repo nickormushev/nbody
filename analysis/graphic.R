@@ -15,38 +15,45 @@ graphic <- function(data, xlabel, ylabel, name) {
        ylab(ylabel)
 }
 
-total_time <- read.csv("./200thou/data/totalTime200thou.csv")
+#gets the minimum total time from the three attempts I made
+get_min_total_time  <- function(total_time) {
+    min_time_per_proc <- data.frame(numProc = numeric(), calcTime = numeric())
+    for (numProc in c(1, 2, 4, 8, 16, 32)) {
+        min_time <- max(
+            total_time[total_time$processorCount == numProc &
+            total_time$iteration == 1, ]$time)
 
-mean_time_per_proc <- data.frame(numProc = numeric(), calcTime = numeric())
-names(mean_time_per_proc)
+        for (i in c(2, 3)) {
+           min_time <- min(min_time, max(
+                    total_time[total_time$processorCount == numProc &
+                    total_time$iteration == i, ]$time)
+           )
+        }
+
+        min_time_per_proc[nrow(min_time_per_proc) + 1, ] <-
+            c(numProc, min_time)
+    }
+
+    min_time_per_proc
+}
+
+total_time200 <- read.csv("./200thou/data/totalTime200thou.csv")
+
+min_time_per_proc <- data.frame(numProc = numeric(), calcTime = numeric())
+names(min_time_per_proc)
+
+min_time_per_proc  <-  get_min_total_time(total_time200)
 
 #gets the max time for the processors and
 #then the min total time for each attempt
-for (numProc in c(1, 2, 4, 8, 16, 32)) {
-    min_time <- max(
-        total_time[total_time$processorCount == numProc &
-        total_time$iteration == 1, ]$time)
 
-    for (i in c(2, 3)) {
-       min_time <- min(min_time, max(
-                total_time[total_time$processorCount == numProc &
-                total_time$iteration == i, ]$time)
-       )
-    }
-
-    mean_time_per_proc[nrow(mean_time_per_proc) + 1, ] <-
-        c(numProc, min_time)
-}
-
-mean_time_per_proc
-
-graphic(mean_time_per_proc, "Брой процеси", "Време в микросекунди",
+graphic(min_time_per_proc, "Брой процеси", "Време в микросекунди",
     "Цялостно време за изпълнение на програмата с 200 хиляди тела")
 
 ggsave("./200thou/png/200thouTime.png", width = 9)
 
 calculation_time <- read.csv("./200thou/data/calculations200thou.csv")
-
+head(calculation_time, n = 20)
 iterations <- 10
 
 min_calc_time <- data.frame(numProc = numeric(), calcTime = numeric())
@@ -62,7 +69,7 @@ for (numProc in c(1, 2, 4, 8, 16, 32)) {
 
         #create a matrx where every row are the times
         #for each processor during a  different iteration
-        m <- matrix(calc_i$time, iterations, numProc)
+        m <- matrix(calc_i$time, nrow = iterations, ncol = numProc)
 
         #Takes the max time for a processor during a single unit of time
         max_times_for_attempt <- apply(m, 1, max, na.rm = T)
@@ -74,10 +81,12 @@ for (numProc in c(1, 2, 4, 8, 16, 32)) {
 
     min_calc_time[nrow(min_calc_time) + 1, ] <- c(numProc, min(max_times))
 }
-min_calc_time
-mean_time_per_proc
 
-overhead_vs_calc_time <- rbind(min_calc_time, mean_time_per_proc)
+min_calc_time
+min_time_per_proc
+
+overhead_vs_calc_time <- rbind(min_calc_time, min_time_per_proc)
+overhead_vs_calc_time
 
 overhead_vs_calc_time$cat <- c(rep("изчисление", 6), rep("изчисление плюс комуникация", 6))
 
@@ -94,17 +103,17 @@ ggsave("./200thou/png/200thouCalcVsTotalTime.png", width = 10)
 
 
 #Speedup calculation_time for one process/ calculation_time for n processes
-mean_time_per_proc$calcTime <- mean_time_per_proc[mean_time_per_proc$numProc == 1, ]$calcTime / mean_time_per_proc$calcTime
+min_time_per_proc$calcTime <- min_time_per_proc[min_time_per_proc$numProc == 1, ]$calcTime / min_time_per_proc$calcTime
 
-graphic(mean_time_per_proc, "Брой процеси", "Ускорение",
+graphic(min_time_per_proc, "Брой процеси", "Ускорение",
         "Ускорени на цялостното време за работа при 200 хиляди тела")
 
 ggsave("./200thou/png/200thouTotalTimeSpeedup.png", width = 9)
 
 #Efficency speedup/number of processes
-mean_time_per_proc$calcTime <- mean_time_per_proc$calcTime / mean_time_per_proc$numProc
+min_time_per_proc$calcTime <- min_time_per_proc$calcTime / min_time_per_proc$numProc
 
-graphic(mean_time_per_proc, "Брой процеси", "Ефективност",
+graphic(min_time_per_proc, "Брой процеси", "Ефективност",
         "Ефективност на цялото време за работа при 200 хиляди тела")
 
 ggsave("./200thou/png/200thouTotalTimeEfficency.png", width = 9)
@@ -145,3 +154,66 @@ p <- ggplot(data = processor_avg,
 p
 
 ggsave("./200thou/png/timeSpentInCalculationsPerProcessor.png", width = 13, height = 7)
+
+
+#Get diagram with data not only for 200 processors
+total_time500 <- read.csv("./500thou/data/totalTime500thou.csv")
+total_time100 <- read.csv("./100thou/data/totalTime100thou.csv")
+total_time200 <- read.csv("./200thou/data/totalTime200thou.csv")
+
+min_time500 <- get_min_total_time(total_time500)
+min_time200 <- get_min_total_time(total_time200)
+min_time100 <- get_min_total_time(total_time100)
+
+min_time100$type <- "100 хиляди тела за 10 единици от време"
+min_time500$type <- "500 хиляди тела за 5 единици от време"
+min_time200$type <- "200 хиляди тела за 10 единици от време"
+min_time100$speedup <- min_time100[min_time100$numProc == 1, ]$calcTime / min_time100$calcTime
+min_time200$speedup <- min_time200[min_time200$numProc == 1, ]$calcTime / min_time200$calcTime
+min_time500$speedup <- min_time500[min_time500$numProc == 1, ]$calcTime / min_time500$calcTime
+
+total_time_all <- rbind(min_time100, min_time500)
+total_time_all <- rbind(total_time_all, min_time200)
+
+graphic_for_total_time <- function (data, gtitle, xlabel, ylabel) {
+    ggplot(data, aes(x = numProc, y = toDisplay, group = type, col = type)) +
+       geom_point() +
+       geom_line() +
+       scale_y_continuous(labels = comma) +
+       ggtitle(gtitle) +
+       theme(plot.title = element_text(hjust = 0.5)) +
+       xlab(xlabel) +
+       ylab(ylabel)
+}
+
+total_time_all$toDisplay <- total_time_all$calcTime
+
+graphic_for_total_time(
+        total_time_all,
+        "Време за работа на програмата спрямо брой процесори",
+        "Брой процесори",
+        "Време в микросекунди")
+
+
+ggsave("./png/totalTime.png", width = 9)
+#Convert calc time to speedup
+total_time_all$toDisplay <- total_time_all$speedup
+
+graphic_for_total_time(
+        total_time_all,
+        "Ускорението на програмата спрямо брой процесори",
+        "Брой процесори",
+        "Ускорение")
+
+ggsave("./png/totalSpeedup.png", width = 9)
+
+#Convert calc time to efficiency
+total_time_all$toDisplay <- total_time_all$speedup / total_time_all$numProc
+
+graphic_for_total_time(
+        total_time_all,
+        "Ефективността на програмата спрямо брой процесори",
+        "Брой процесори",
+        "Ефективност")
+
+ggsave("./png/totalEfficiency.png", width = 9)

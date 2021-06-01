@@ -1,0 +1,1498 @@
+LOOOOOOP 1
+904 time to find ORB split
+20318 time to find ORB split
+4 SIZE 8
+17170 time to find ORB split
+4 SIZE 8
+13909 time to find ORB split
+4 SIZE 8
+10918 time to find ORB split
+4 SIZE 8
+7769 time to find ORB split
+4766 time to find ORB split
+4 SIZE 8
+834 time to find ORB split
+4 SIZE 8
+4 SIZE 8
+4 SIZE 8
+19786 time to find ORB split
+2 SIZE 4
+LOOOOOOP 0
+19846 time to find ORB split
+2 SIZE 4
+19781 time to find ORB split
+2 SIZE 4
+19805 time to find ORB split
+2 SIZE 4
+19801 time to find ORB split
+2 SIZE 4
+19805 time to find ORB split
+2 SIZE 4
+19794 time to find ORB split
+2 SIZE 4
+19777 time to find ORB split
+2 SIZE 4
+947 time to find ORB split
+1 SIZE 2
+948 time to find ORB split
+1 SIZE 2
+947 time to find ORB split
+1 SIZE 2
+948 time to find ORB split
+1 SIZE 2
+948 time to find ORB split
+1 SIZE 2
+934 time to find ORB split
+1 SIZE 2
+LOOOOOOP 1
+970 time to find ORB split
+1 SIZE 2
+947 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 31690 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 31685 time to find ORB split
+1 SIZE 2
+0HERE 4HERE LOOOOOOP 0
+20769 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 31693 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 31690 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 31693 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 31690 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 20077 time to find ORB split
+1 SIZE 2
+2HERE 6HERE LOOOOOOP 1
+12147 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 664 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 12118 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 2035 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 12119 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 12118 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 12118 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 12112 time to find ORB split
+2 SIZE 4
+906 time to find ORB split
+1 SIZE 2
+906 time to find ORB split
+1 SIZE 2
+LOOOOOOP 1
+923 time to find ORB split
+1 SIZE 2
+873 time to find ORB split
+1 SIZE 2
+906 time to find ORB split
+1 SIZE 2
+907 time to find ORB split
+1 SIZE 2
+905 time to find ORB split
+1 SIZE 2
+907 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 21441 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 30769 time to find ORB split
+1 SIZE 2
+1HERE 5HERE LOOOOOOP 0
+30795 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 30770 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 18517 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 30771 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 30769 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 30771 time to find ORB split
+1 SIZE 2
+3HERE 7HERE 65875 Local tree build and local splits get time
+3HERE 7HERE 65804 Local tree build and local splits get time
+3HERE 7HERE 66583 Local tree build and local splits get time
+3HERE 7HERE 67081 Local tree build and local splits get time
+3HERE 7HERE 68456 Local tree build and local splits get time
+3HERE 7HERE 69082 Local tree build and local splits get time
+3HERE 7HERE 66421 Local tree build and local splits get time
+3HERE 7HERE 81924 Local tree build and local splits get time
+47 find toSend
+40 find toSend
+594 find toSend
+602 find toSend
+1225 find toSend
+1281 find toSend
+1329 find toSend
+59 find toSend
+297  exchange bodies
+627  exchange bodies
+846  exchange bodies
+10333  exchange bodies
+10818  exchange bodies
+14717  exchange bodies
+17622  exchange bodies
+19653  exchange bodies
+4478  Time for tree metrics recalculation
+4501  Time for tree metrics recalculation
+4720  Time for tree metrics recalculation
+5300  Time for tree metrics recalculation
+5337  Time for tree metrics recalculation
+5466  Time for tree metrics recalculation
+5491  Time for tree metrics recalculation
+5775  Time for tree metrics recalculation
+83 find toSend
+283 find toSend
+291 find toSend
+325 find toSend
+517 find toSend
+548 find toSend
+536 find toSend
+894 find toSend
+1858  exchange bodies
+7501  exchange bodies
+8587  exchange bodies
+9362  exchange bodies
+9431  exchange bodies
+10192  exchange bodies
+10272  exchange bodies
+16645  exchange bodies
+5281  Time for tree metrics recalculation
+5601  Time for tree metrics recalculation
+5892  Time for tree metrics recalculation
+6025  Time for tree metrics recalculation
+6350  Time for tree metrics recalculation
+6363  Time for tree metrics recalculation
+6435  Time for tree metrics recalculation
+6853  Time for tree metrics recalculation
+832 find toSend
+936 find toSend
+912 find toSend
+904 find toSend
+975 find toSend
+974 find toSend
+1042 find toSend
+1193 find toSend
+13511  exchange bodies
+16969  exchange bodies
+17699  exchange bodies
+17947  exchange bodies
+18195  exchange bodies
+18785  exchange bodies
+19480  exchange bodies
+19670  exchange bodies
+6763  Time for tree metrics recalculation
+7108  Time for tree metrics recalculation
+7196  Time for tree metrics recalculation
+7416  Time for tree metrics recalculation
+7659  Time for tree metrics recalculation
+7778  Time for tree metrics recalculation
+7898  Time for tree metrics recalculation
+85637 TIME Locally Essential For
+85640 TIME Locally Essential For
+85662 TIME Locally Essential For
+85662 TIME Locally Essential For
+85633 TIME Locally Essential For
+85662 TIME Locally Essential For
+8369  Time for tree metrics recalculation
+85643 TIME Locally Essential For
+85662 TIME Locally Essential For
+22645202 2 Calculations time
+22833490 0 Calculations time
+23328751 7 Calculations time
+23439064 5 Calculations time
+23543261 6 Calculations time
+23661376 3 Calculations time
+23687388 4 Calculations time
+24415940 1 Calculations time
+END 2306476309
+END 2070856621
+END 2230902270
+END 2108244717
+END 2102814875
+END 2128644733
+END 2128817293
+END 2135806016
+24602900 Build locally essential tree time
+24604279 Build locally essential tree time
+24593675 Build locally essential tree time
+24605664 Build locally essential tree time
+24594739 Build locally essential tree time
+24606404 Build locally essential tree time
+24607218 Build locally essential tree time
+24607183 Build locally essential tree time
+43326 time for synchronization of processor bodies
+43315 time for synchronization of processor bodies
+43515 time for synchronization of processor bodies
+43502 time for synchronization of processor bodies
+43552 time for synchronization of processor bodies
+43543 time for synchronization of processor bodies
+44412 time for synchronization of processor bodies
+44425 time for synchronization of processor bodies
+BEFORE ORB 2128644733
+BEFORE ORB 2070856621
+BEFORE ORB 2306476309
+BEFORE ORB 2230902270
+BEFORE ORB 2108244717
+BEFORE ORB 2135806016
+BEFORE ORB 2128817293
+BEFORE ORB 2102814875
+13232 time to find ORB split
+4 SIZE 8
+13159 time to find ORB split
+4 SIZE 8
+13322 time to find ORB split
+4 SIZE 8
+13190 time to find ORB split
+4 SIZE 8
+13243 time to find ORB split
+4 SIZE 8
+LOOOOOOP 0
+13298 time to find ORB split
+4 SIZE 8
+13232 time to find ORB split
+4 SIZE 8
+13167 time to find ORB split
+4 SIZE 8
+12601 time to find ORB split
+2 SIZE 4
+12601 time to find ORB split
+2 SIZE 4
+12601 time to find ORB split
+2 SIZE 4
+12604 time to find ORB split
+2 SIZE 4
+12601 time to find ORB split
+2 SIZE 4
+12604 time to find ORB split
+2 SIZE 4
+LOOOOOOP 0
+12628 time to find ORB split
+2 SIZE 4
+12604 time to find ORB split
+2 SIZE 4
+14514 time to find ORB split
+1 SIZE 2
+14514 time to find ORB split
+1 SIZE 2
+14514 time to find ORB split
+1 SIZE 2
+14514 time to find ORB split
+1 SIZE 2
+14515 time to find ORB split
+1 SIZE 2
+14515 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+14540 time to find ORB split
+1 SIZE 2
+14514 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16584 time to find ORB split
+1 SIZE 2
+0HERE 4HERE LOOOOOOP 1
+11841 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 11946 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16581 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16581 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16584 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16581 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16582 time to find ORB split
+1 SIZE 2
+2HERE 6HERE 22426 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14072 time to find ORB split
+2 SIZE 4
+2HERE 6HERE LOOOOOOP 0
+22470 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 22427 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 22427 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 22425 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 17220 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 22426 time to find ORB split
+2 SIZE 4
+12859 time to find ORB split
+1 SIZE 2
+12859 time to find ORB split
+1 SIZE 2
+12846 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+12890 time to find ORB split
+1 SIZE 2
+12859 time to find ORB split
+1 SIZE 2
+12859 time to find ORB split
+1 SIZE 2
+12859 time to find ORB split
+1 SIZE 2
+12859 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14811 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14811 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14813 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 9705 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14812 time to find ORB split
+1 SIZE 2
+1HERE 5HERE LOOOOOOP 0
+14839 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14812 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 10118 time to find ORB split
+1 SIZE 2
+3HERE 7HERE 
+AFTER 65997 35764 65997 2155005396
+3HERE 7HERE 
+AFTER 67004 27535 67004 2154847901
+3HERE 7HERE 
+AFTER 63143 24013 63143 2153021294
+3HERE 7HERE 
+AFTER 58476 40009 58476 2149497993
+3HERE 7HERE 
+AFTER 64642 33532 64642 2143711285
+3HERE 7HERE 
+AFTER 62979 37435 62979 2150497551
+120069 ORB build time
+3HERE 7HERE 
+AFTER 59387 28213 59387 2147601818
+120071 ORB build time
+3HERE 7HERE 
+AFTER 58372 40132 58372 2158379596
+120070 ORB build time
+120069 ORB build time
+120069 ORB build time
+120069 ORB build time
+120071 ORB build time
+120065 ORB build time
+57409 Local tree build and local splits get time
+59801 Local tree build and local splits get time
+60907 Local tree build and local splits get time
+62683 Local tree build and local splits get time
+63671 Local tree build and local splits get time
+67301 Local tree build and local splits get time
+69043 Local tree build and local splits get time
+71002 Local tree build and local splits get time
+36 find toSend
+38 find toSend
+278 find toSend
+316 find toSend
+708 find toSend
+683 find toSend
+1317 find toSend
+1638 find toSend
+485  exchange bodies
+559  exchange bodies
+4217  exchange bodies
+5162  exchange bodies
+8397  exchange bodies
+9357  exchange bodies
+14055  exchange bodies
+14400  exchange bodies
+3987  Time for tree metrics recalculation
+4403  Time for tree metrics recalculation
+4753  Time for tree metrics recalculation
+5028  Time for tree metrics recalculation
+5102  Time for tree metrics recalculation
+5257  Time for tree metrics recalculation
+5474  Time for tree metrics recalculation
+5725  Time for tree metrics recalculation
+29 find toSend
+44 find toSend
+284 find toSend
+296 find toSend
+347 find toSend
+509 find toSend
+537 find toSend
+816 find toSend
+210  exchange bodies
+589  exchange bodies
+7283  exchange bodies
+7330  exchange bodies
+8799  exchange bodies
+10004  exchange bodies
+14550  exchange bodies
+16601  exchange bodies
+4268  Time for tree metrics recalculation
+5536  Time for tree metrics recalculation
+5531  Time for tree metrics recalculation
+5664  Time for tree metrics recalculation
+5850  Time for tree metrics recalculation
+5926  Time for tree metrics recalculation
+6016  Time for tree metrics recalculation
+6695  Time for tree metrics recalculation
+554 find toSend
+616 find toSend
+788 find toSend
+828 find toSend
+879 find toSend
+953 find toSend
+1276 find toSend
+1385 find toSend
+12166  exchange bodies
+13405  exchange bodies
+14362  exchange bodies
+14580  exchange bodies
+15052  exchange bodies
+15310  exchange bodies
+16974  exchange bodies
+18277  exchange bodies
+6315  Time for tree metrics recalculation
+7896  Time for tree metrics recalculation
+7873  Time for tree metrics recalculation
+8559  Time for tree metrics recalculation
+8650  Time for tree metrics recalculation
+8863  Time for tree metrics recalculation
+9220  Time for tree metrics recalculation
+9361  Time for tree metrics recalculation
+80396 TIME Locally Essential For
+80400 TIME Locally Essential For
+80397 TIME Locally Essential For
+80396 TIME Locally Essential For
+80395 TIME Locally Essential For
+80400 TIME Locally Essential For
+80392 TIME Locally Essential For
+80390 TIME Locally Essential For
+21667317 1 Calculations time
+21726197 4 Calculations time
+22884230 0 Calculations time
+22901324 3 Calculations time
+23485075 2 Calculations time
+23489049 5 Calculations time
+24818858 6 Calculations time
+25431434 7 Calculations time
+END 2326731933
+END 2092567193
+END 2337757683
+END 2211806842
+END 2312036321
+END 2001323685
+END 2228883448
+END 2120694279
+25588730 Build locally essential tree time
+25589875 Build locally essential tree time
+25591484 Build locally essential tree time
+25592684 Build locally essential tree time
+25592813 Build locally essential tree time
+25592921 Build locally essential tree time
+25593048 Build locally essential tree time
+25593146 Build locally essential tree time
+43234 time for synchronization of processor bodies
+43226 time for synchronization of processor bodies
+43502 time for synchronization of processor bodies
+43510 time for synchronization of processor bodies
+43905 time for synchronization of processor bodies
+43912 time for synchronization of processor bodies
+44373 time for synchronization of processor bodies
+44380 time for synchronization of processor bodies
+BEFORE ORB 2092567193
+BEFORE ORB 2337757683
+BEFORE ORB 2312036321
+BEFORE ORB 2228883448
+BEFORE ORB 2001323685
+BEFORE ORB 2326731933
+BEFORE ORB 2120694279
+BEFORE ORB 2211806842
+10023 time to find ORB split
+4 SIZE 8
+9996 time to find ORB split
+4 SIZE 8
+LOOOOOOP 0
+9892 time to find ORB split
+4 SIZE 8
+10114 time to find ORB split
+4 SIZE 8
+10001 time to find ORB split
+4 SIZE 8
+10006 time to find ORB split
+4 SIZE 8
+10006 time to find ORB split
+4 SIZE 8
+9893 time to find ORB split
+4 SIZE 8
+11823 time to find ORB split
+2 SIZE 4
+11823 time to find ORB split
+2 SIZE 4
+11823 time to find ORB split
+2 SIZE 4
+LOOOOOOP 0
+11848 time to find ORB split
+2 SIZE 4
+11823 time to find ORB split
+2 SIZE 4
+11823 time to find ORB split
+2 SIZE 4
+11823 time to find ORB split
+2 SIZE 4
+11823 time to find ORB split
+2 SIZE 4
+11510 time to find ORB split
+1 SIZE 2
+11511 time to find ORB split
+1 SIZE 2
+11510 time to find ORB split
+1 SIZE 2
+11510 time to find ORB split
+1 SIZE 2
+11510 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+11537 time to find ORB split
+1 SIZE 2
+11512 time to find ORB split
+1 SIZE 2
+11512 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16707 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16707 time to find ORB split
+1 SIZE 2
+0HERE 4HERE LOOOOOOP 0
+11856 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16710 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16707 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16707 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 11925 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 16710 time to find ORB split
+1 SIZE 2
+2HERE 6HERE LOOOOOOP 0
+14143 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 8932 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14115 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14114 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 9482 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14113 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14116 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14116 time to find ORB split
+2 SIZE 4
+11670 time to find ORB split
+1 SIZE 2
+11670 time to find ORB split
+1 SIZE 2
+11669 time to find ORB split
+1 SIZE 2
+11669 time to find ORB split
+1 SIZE 2
+11670 time to find ORB split
+1 SIZE 2
+11670 time to find ORB split
+1 SIZE 2
+LOOOOOOP 2
+11693 time to find ORB split
+1 SIZE 2
+11669 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 18046 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 18047 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 10671 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 18047 time to find ORB split
+1 SIZE 2
+1HERE 5HERE LOOOOOOP 0
+18055 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 13416 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 18048 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 18048 time to find ORB split
+1 SIZE 2
+3HERE 7HERE 
+AFTER 63588 39875 63588 2199769046
+3HERE 7HERE 
+AFTER 65383 36412 65383 2212946917
+3HERE 7HERE 
+AFTER 56785 39832 56785 2202060776
+3HERE 7HERE 
+AFTER 64710 33439 64710 2207708958
+3HERE 7HERE 
+AFTER 62607 39408 62607 2201468040
+3HERE 7HERE 
+AFTER 58083 40062 58083 2205670690
+3HERE 7HERE 
+AFTER 61059 38482 61059 2199835657
+103569 ORB build time
+103571 ORB build time
+103567 ORB build time
+3HERE 7HERE 
+AFTER 67785 18376 67785 2202341300
+103571 ORB build time
+103568 ORB build time
+103571 ORB build time
+103571 ORB build time
+103568 ORB build time
+59848 Local tree build and local splits get time
+60495 Local tree build and local splits get time
+61232 Local tree build and local splits get time
+61571 Local tree build and local splits get time
+62494 Local tree build and local splits get time
+64626 Local tree build and local splits get time
+68328 Local tree build and local splits get time
+72746 Local tree build and local splits get time
+34 find toSend
+27 find toSend
+654 find toSend
+430 find toSend
+276 find toSend
+662 find toSend
+1228 find toSend
+1299 find toSend
+238  exchange bodies
+528  exchange bodies
+4631  exchange bodies
+7075  exchange bodies
+7798  exchange bodies
+9415  exchange bodies
+13742  exchange bodies
+15761  exchange bodies
+4220  Time for tree metrics recalculation
+4430  Time for tree metrics recalculation
+5001  Time for tree metrics recalculation
+5165  Time for tree metrics recalculation
+5386  Time for tree metrics recalculation
+5619  Time for tree metrics recalculation
+5725  Time for tree metrics recalculation
+5993  Time for tree metrics recalculation
+25 find toSend
+32 find toSend
+268 find toSend
+276 find toSend
+500 find toSend
+570 find toSend
+899 find toSend
+1047 find toSend
+233  exchange bodies
+255  exchange bodies
+6808  exchange bodies
+6898  exchange bodies
+8689  exchange bodies
+9586  exchange bodies
+17195  exchange bodies
+17381  exchange bodies
+4084  Time for tree metrics recalculation
+5792  Time for tree metrics recalculation
+5821  Time for tree metrics recalculation
+5872  Time for tree metrics recalculation
+5903  Time for tree metrics recalculation
+5972  Time for tree metrics recalculation
+6106  Time for tree metrics recalculation
+6789  Time for tree metrics recalculation
+514 find toSend
+707 find toSend
+888 find toSend
+933 find toSend
+1010 find toSend
+1094 find toSend
+1220 find toSend
+1248 find toSend
+12979  exchange bodies
+14255  exchange bodies
+14894  exchange bodies
+15939  exchange bodies
+15983  exchange bodies
+16426  exchange bodies
+17135  exchange bodies
+20668  exchange bodies
+5830  Time for tree metrics recalculation
+7140  Time for tree metrics recalculation
+7147  Time for tree metrics recalculation
+7280  Time for tree metrics recalculation
+7280  Time for tree metrics recalculation
+7529  Time for tree metrics recalculation
+7581  Time for tree metrics recalculation
+8019  Time for tree metrics recalculation
+82815 TIME Locally Essential For
+82813 TIME Locally Essential For
+82814 TIME Locally Essential For
+82815 TIME Locally Essential For
+82808 TIME Locally Essential For
+82798 TIME Locally Essential For
+82803 TIME Locally Essential For
+82804 TIME Locally Essential For
+21095215 3 Calculations time
+21459785 6 Calculations time
+23215121 0 Calculations time
+23372848 7 Calculations time
+23430101 2 Calculations time
+23904941 4 Calculations time
+24438568 5 Calculations time
+24963245 1 Calculations time
+END 2307400217
+END 2305632318
+END 1998851969
+END 2185561596
+END 2182724519
+END 1920339723
+END 2360012421
+END 2219759790
+25125202 Build locally essential tree time
+25127071 Build locally essential tree time
+25127247 Build locally essential tree time
+25128033 Build locally essential tree time
+25128146 Build locally essential tree time
+25128676 Build locally essential tree time
+25128732 Build locally essential tree time
+25129631 Build locally essential tree time
+43734 time for synchronization of processor bodies
+43747 time for synchronization of processor bodies
+44069 time for synchronization of processor bodies
+44055 time for synchronization of processor bodies
+44621 time for synchronization of processor bodies
+44634 time for synchronization of processor bodies
+44668 time for synchronization of processor bodies
+44654 time for synchronization of processor bodies
+BEFORE ORB 2305632318
+BEFORE ORB 2360012421
+BEFORE ORB 1998851969
+BEFORE ORB 2182724519
+BEFORE ORB 2219759790
+BEFORE ORB 1920339723
+BEFORE ORB 2307400217
+BEFORE ORB 2185561596
+11157 time to find ORB split
+4 SIZE 8
+LOOOOOOP 0
+11013 time to find ORB split
+4 SIZE 8
+11149 time to find ORB split
+4 SIZE 8
+11191 time to find ORB split
+4 SIZE 8
+11156 time to find ORB split
+4 SIZE 8
+11082 time to find ORB split
+4 SIZE 8
+11157 time to find ORB split
+4 SIZE 8
+11188 time to find ORB split
+4 SIZE 8
+11243 time to find ORB split
+2 SIZE 4
+11240 time to find ORB split
+2 SIZE 4
+LOOOOOOP 0
+11270 time to find ORB split
+2 SIZE 4
+11241 time to find ORB split
+2 SIZE 4
+11243 time to find ORB split
+2 SIZE 4
+11243 time to find ORB split
+2 SIZE 4
+11241 time to find ORB split
+2 SIZE 4
+11241 time to find ORB split
+2 SIZE 4
+7676 time to find ORB split
+1 SIZE 2
+7676 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+7701 time to find ORB split
+1 SIZE 2
+7676 time to find ORB split
+1 SIZE 2
+7677 time to find ORB split
+1 SIZE 2
+7677 time to find ORB split
+1 SIZE 2
+7676 time to find ORB split
+1 SIZE 2
+7677 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 15037 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 15036 time to find ORB split
+1 SIZE 2
+0HERE 4HERE LOOOOOOP 0
+10519 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 15038 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 15037 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 15037 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 15038 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 10528 time to find ORB split
+1 SIZE 2
+2HERE 6HERE 15815 time to find ORB split
+2 SIZE 4
+2HERE 6HERE LOOOOOOP 0
+15842 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 15816 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 10273 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 9966 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 15815 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 15816 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 15816 time to find ORB split
+2 SIZE 4
+11927 time to find ORB split
+1 SIZE 2
+11928 time to find ORB split
+1 SIZE 2
+11927 time to find ORB split
+1 SIZE 2
+11928 time to find ORB split
+1 SIZE 2
+11927 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+11955 time to find ORB split
+1 SIZE 2
+11927 time to find ORB split
+1 SIZE 2
+11928 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 16609 time to find ORB split
+1 SIZE 2
+1HERE 5HERE LOOOOOOP 0
+16633 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 11949 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 16606 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 10931 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 16606 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 16610 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 16607 time to find ORB split
+1 SIZE 2
+3HERE 7HERE 
+AFTER 64886 22732 64886 2184361118
+3HERE 7HERE 
+AFTER 57688 20839 57688 2183243054
+3HERE 7HERE 
+AFTER 61956 23230 61956 2184037209
+3HERE 7HERE 
+AFTER 64133 37174 64133 2191375079
+3HERE 7HERE 
+AFTER 67221 23464 67221 2186995519
+3HERE 7HERE 
+AFTER 57067 39298 57067 2180479858
+3HERE 7HERE 
+AFTER 62706 36133 62706 2189598872
+3HERE 7HERE 
+AFTER 64343 33427 64343 2180191844
+99064 ORB build time
+99062 ORB build time
+99063 ORB build time
+99065 ORB build time
+99065 ORB build time
+99061 ORB build time
+99062 ORB build time
+99064 ORB build time
+57986 Local tree build and local splits get time
+58321 Local tree build and local splits get time
+62174 Local tree build and local splits get time
+63656 Local tree build and local splits get time
+64021 Local tree build and local splits get time
+64098 Local tree build and local splits get time
+66409 Local tree build and local splits get time
+74183 Local tree build and local splits get time
+34 find toSend
+32 find toSend
+419 find toSend
+252 find toSend
+617 find toSend
+604 find toSend
+1273 find toSend
+1174 find toSend
+473  exchange bodies
+474  exchange bodies
+6512  exchange bodies
+8722  exchange bodies
+8783  exchange bodies
+9315  exchange bodies
+13535  exchange bodies
+14562  exchange bodies
+3947  Time for tree metrics recalculation
+4588  Time for tree metrics recalculation
+4841  Time for tree metrics recalculation
+5085  Time for tree metrics recalculation
+5353  Time for tree metrics recalculation
+5560  Time for tree metrics recalculation
+5620  Time for tree metrics recalculation
+5972  Time for tree metrics recalculation
+29 find toSend
+30 find toSend
+253 find toSend
+300 find toSend
+498 find toSend
+523 find toSend
+617 find toSend
+840 find toSend
+175  exchange bodies
+260  exchange bodies
+6914  exchange bodies
+7256  exchange bodies
+9257  exchange bodies
+10031  exchange bodies
+16543  exchange bodies
+16975  exchange bodies
+4144  Time for tree metrics recalculation
+5784  Time for tree metrics recalculation
+5812  Time for tree metrics recalculation
+5802  Time for tree metrics recalculation
+6036  Time for tree metrics recalculation
+6070  Time for tree metrics recalculation
+6289  Time for tree metrics recalculation
+6742  Time for tree metrics recalculation
+556 find toSend
+631 find toSend
+813 find toSend
+907 find toSend
+914 find toSend
+983 find toSend
+1074 find toSend
+1250 find toSend
+13982  exchange bodies
+16278  exchange bodies
+17059  exchange bodies
+17628  exchange bodies
+17750  exchange bodies
+18449  exchange bodies
+20489  exchange bodies
+20802  exchange bodies
+5982  Time for tree metrics recalculation
+7667  Time for tree metrics recalculation
+7745  Time for tree metrics recalculation
+7775  Time for tree metrics recalculation
+8259  Time for tree metrics recalculation
+8417  Time for tree metrics recalculation
+8445  Time for tree metrics recalculation
+8520  Time for tree metrics recalculation
+81298 TIME Locally Essential For
+81268 TIME Locally Essential For
+81293 TIME Locally Essential For
+81296 TIME Locally Essential For
+81296 TIME Locally Essential For
+81274 TIME Locally Essential For
+81276 TIME Locally Essential For
+81280 TIME Locally Essential For
+21364329 4 Calculations time
+21745427 1 Calculations time
+23143139 0 Calculations time
+24222897 2 Calculations time
+24894488 5 Calculations time
+25086725 6 Calculations time
+25990235 3 Calculations time
+26055576 7 Calculations time
+END 2240129056
+END 2266925627
+END 2017918167
+END 2247618172
+END 2383303490
+END 2361296414
+END 1995539623
+END 2189275735
+26216949 Build locally essential tree time
+26219461 Build locally essential tree time
+26220797 Build locally essential tree time
+26221090 Build locally essential tree time
+26221278 Build locally essential tree time
+26222178 Build locally essential tree time
+26222302 Build locally essential tree time
+26222757 Build locally essential tree time
+43963 time for synchronization of processor bodies
+43955 time for synchronization of processor bodies
+44201 time for synchronization of processor bodies
+44207 time for synchronization of processor bodies
+44759 time for synchronization of processor bodies
+44754 time for synchronization of processor bodies
+45292 time for synchronization of processor bodies
+45298 time for synchronization of processor bodies
+BEFORE ORB 2017918167
+BEFORE ORB 1995539623
+BEFORE ORB 2383303490
+BEFORE ORB 2361296414
+BEFORE ORB 2247618172
+BEFORE ORB 2240129056
+BEFORE ORB 2189275735
+BEFORE ORB 2266925627
+719 time to find ORB split
+4 SIZE 8
+578 time to find ORB split
+4 SIZE 8
+593 time to find ORB split
+4 SIZE 8
+LOOOOOOP 1
+519 time to find ORB split
+4 SIZE 8
+705 time to find ORB split
+4 SIZE 8
+539 time to find ORB split
+4 SIZE 8
+493 time to find ORB split
+4 SIZE 8
+520 time to find ORB split
+4 SIZE 8
+11602 time to find ORB split
+2 SIZE 4
+11602 time to find ORB split
+2 SIZE 4
+11602 time to find ORB split
+2 SIZE 4
+11603 time to find ORB split
+2 SIZE 4
+11602 time to find ORB split
+2 SIZE 4
+LOOOOOOP 0
+11629 time to find ORB split
+2 SIZE 4
+11601 time to find ORB split
+2 SIZE 4
+11602 time to find ORB split
+2 SIZE 4
+12463 time to find ORB split
+1 SIZE 2
+12462 time to find ORB split
+1 SIZE 2
+12463 time to find ORB split
+1 SIZE 2
+12462 time to find ORB split
+1 SIZE 2
+12463 time to find ORB split
+1 SIZE 2
+12463 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+12486 time to find ORB split
+1 SIZE 2
+12462 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 18251 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 18249 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 18249 time to find ORB split
+1 SIZE 2
+0HERE 4HERE LOOOOOOP 0
+13490 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13526 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 18249 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 18251 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 18249 time to find ORB split
+1 SIZE 2
+2HERE 6HERE 16268 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 10892 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 16268 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 16268 time to find ORB split
+2 SIZE 4
+2HERE 6HERE LOOOOOOP 0
+16307 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 16269 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 16268 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 11690 time to find ORB split
+2 SIZE 4
+10964 time to find ORB split
+1 SIZE 2
+10965 time to find ORB split
+1 SIZE 2
+10964 time to find ORB split
+1 SIZE 2
+10963 time to find ORB split
+1 SIZE 2
+10964 time to find ORB split
+1 SIZE 2
+10964 time to find ORB split
+1 SIZE 2
+10965 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+10994 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 11778 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 5832 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 11778 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 11776 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 11776 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 7221 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 11778 time to find ORB split
+1 SIZE 2
+1HERE 5HERE LOOOOOOP 0
+11818 time to find ORB split
+1 SIZE 2
+3HERE 7HERE 
+AFTER 63386 34607 63386 2208435663
+3HERE 7HERE 
+AFTER 60877 28597 60877 2212024541
+3HERE 7HERE 
+AFTER 58935 40863 58935 2218784850
+3HERE 7HERE 
+AFTER 57539 40437 57539 2206884678
+3HERE 7HERE 
+AFTER 64701 34240 64701 2219364711
+3HERE 7HERE 
+AFTER 65241 38395 65241 2216562091
+3HERE 7HERE 
+AFTER 62685 35793 62685 2209185308
+92283 ORB build time
+92281 ORB build time
+3HERE 7HERE 
+AFTER 66636 18673 66636 2210764442
+92283 ORB build time
+92281 ORB build time
+92281 ORB build time
+92255 ORB build time
+92282 ORB build time
+92249 ORB build time
+60324 Local tree build and local splits get time
+60263 Local tree build and local splits get time
+61346 Local tree build and local splits get time
+62836 Local tree build and local splits get time
+64046 Local tree build and local splits get time
+67142 Local tree build and local splits get time
+67571 Local tree build and local splits get time
+76223 Local tree build and local splits get time
+31 find toSend
+125 find toSend
+646 find toSend
+502 find toSend
+289 find toSend
+671 find toSend
+1313 find toSend
+1260 find toSend
+547  exchange bodies
+882  exchange bodies
+4724  exchange bodies
+7655  exchange bodies
+8100  exchange bodies
+9518  exchange bodies
+15628  exchange bodies
+16251  exchange bodies
+4353  Time for tree metrics recalculation
+4452  Time for tree metrics recalculation
+5144  Time for tree metrics recalculation
+5206  Time for tree metrics recalculation
+5299  Time for tree metrics recalculation
+5437  Time for tree metrics recalculation
+5742  Time for tree metrics recalculation
+5887  Time for tree metrics recalculation
+37 find toSend
+37 find toSend
+330 find toSend
+354 find toSend
+533 find toSend
+660 find toSend
+926 find toSend
+1261 find toSend
+234  exchange bodies
+231  exchange bodies
+7583  exchange bodies
+8586  exchange bodies
+9288  exchange bodies
+11431  exchange bodies
+18254  exchange bodies
+18476  exchange bodies
+4152  Time for tree metrics recalculation
+5736  Time for tree metrics recalculation
+5748  Time for tree metrics recalculation
+5770  Time for tree metrics recalculation
+5874  Time for tree metrics recalculation
+5921  Time for tree metrics recalculation
+6058  Time for tree metrics recalculation
+6520  Time for tree metrics recalculation
+523 find toSend
+639 find toSend
+668 find toSend
+796 find toSend
+857 find toSend
+946 find toSend
+1042 find toSend
+1151 find toSend
+14847  exchange bodies
+14849  exchange bodies
+16047  exchange bodies
+16044  exchange bodies
+16315  exchange bodies
+19148  exchange bodies
+19341  exchange bodies
+21605  exchange bodies
+5953  Time for tree metrics recalculation
+7129  Time for tree metrics recalculation
+7204  Time for tree metrics recalculation
+7279  Time for tree metrics recalculation
+7295  Time for tree metrics recalculation
+7628  Time for tree metrics recalculation
+7679  Time for tree metrics recalculation
+7998  Time for tree metrics recalculation
+85194 TIME Locally Essential For
+85187 TIME Locally Essential For
+85184 TIME Locally Essential For
+85184 TIME Locally Essential For
+85196 TIME Locally Essential For
+85193 TIME Locally Essential For
+85181 TIME Locally Essential For
+85196 TIME Locally Essential For
+23037308 0 Calculations time
+23143436 6 Calculations time
+23423913 4 Calculations time
+23544495 3 Calculations time
+23893315 2 Calculations time
+25372566 1 Calculations time
+25604391 5 Calculations time
+26374959 7 Calculations time
+END 2143571483
+END 2300570425
+END 2076729417
+END 2172785847
+END 2148175376
+END 1930804187
+END 2417235429
+END 2246642492
+26542495 Build locally essential tree time
+26543942 Build locally essential tree time
+26544389 Build locally essential tree time
+26544565 Build locally essential tree time
+26545736 Build locally essential tree time
+26545837 Build locally essential tree time
+26545834 Build locally essential tree time
+26546285 Build locally essential tree time
+41873 time for synchronization of processor bodies
+41883 time for synchronization of processor bodies
+42196 time for synchronization of processor bodies
+42190 time for synchronization of processor bodies
+42507 time for synchronization of processor bodies
+42488 time for synchronization of processor bodies
+42495 time for synchronization of processor bodies
+42478 time for synchronization of processor bodies
+BEFORE ORB 2148175376
+BEFORE ORB 2246642492
+BEFORE ORB 2300570425
+BEFORE ORB 2076729417
+BEFORE ORB 2417235429
+BEFORE ORB 1930804187
+BEFORE ORB 2172785847
+BEFORE ORB 2143571483
+11377 time to find ORB split
+4 SIZE 8
+11470 time to find ORB split
+4 SIZE 8
+11397 time to find ORB split
+4 SIZE 8
+11473 time to find ORB split
+4 SIZE 8
+LOOOOOOP 0
+11387 time to find ORB split
+4 SIZE 8
+11476 time to find ORB split
+4 SIZE 8
+11444 time to find ORB split
+4 SIZE 8
+11476 time to find ORB split
+4 SIZE 8
+14299 time to find ORB split
+2 SIZE 4
+14300 time to find ORB split
+2 SIZE 4
+14300 time to find ORB split
+2 SIZE 4
+14299 time to find ORB split
+2 SIZE 4
+14276 time to find ORB split
+2 SIZE 4
+LOOOOOOP 0
+14306 time to find ORB split
+2 SIZE 4
+14299 time to find ORB split
+2 SIZE 4
+14300 time to find ORB split
+2 SIZE 4
+8198 time to find ORB split
+1 SIZE 2
+8199 time to find ORB split
+1 SIZE 2
+8198 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+8227 time to find ORB split
+1 SIZE 2
+8218 time to find ORB split
+1 SIZE 2
+8219 time to find ORB split
+1 SIZE 2
+8199 time to find ORB split
+1 SIZE 2
+8199 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13818 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13817 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13817 time to find ORB split
+1 SIZE 2
+0HERE 4HERE LOOOOOOP 8
+9452 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13818 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13818 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 9520 time to find ORB split
+1 SIZE 2
+0HERE 4HERE 13818 time to find ORB split
+1 SIZE 2
+2HERE 6HERE 14911 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 10562 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14912 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14913 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14899 time to find ORB split
+2 SIZE 4
+2HERE 6HERE LOOOOOOP 0
+14948 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 14913 time to find ORB split
+2 SIZE 4
+2HERE 6HERE 10515 time to find ORB split
+2 SIZE 4
+13384 time to find ORB split
+1 SIZE 2
+13384 time to find ORB split
+1 SIZE 2
+13385 time to find ORB split
+1 SIZE 2
+13385 time to find ORB split
+1 SIZE 2
+13383 time to find ORB split
+1 SIZE 2
+LOOOOOOP 0
+13419 time to find ORB split
+1 SIZE 2
+13385 time to find ORB split
+1 SIZE 2
+13385 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14181 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14183 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14183 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14181 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 9951 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 14183 time to find ORB split
+1 SIZE 2
+1HERE 5HERE LOOOOOOP 0
+14202 time to find ORB split
+1 SIZE 2
+1HERE 5HERE 9803 time to find ORB split
+1 SIZE 2
+3HERE 7HERE 
+AFTER 66375 37416 66375 2183397763
+3HERE 7HERE 
+AFTER 61986 38018 61986 2185675255
+3HERE 7HERE 
+AFTER 57168 36325 57168 2171949627
+3HERE 7HERE 
+AFTER 62699 15359 62699 2183949422
+3HERE 7HERE 
+AFTER 57077 20734 57077 2177882452
+3HERE 7HERE 
+AFTER 64471 33625 64471 2179071439
+3HERE 7HERE 
+AFTER 66675 26876 66675 2178165055
+100053 ORB build time
+3HERE 7HERE 
+AFTER 63549 36606 63549 2176423643
+100058 ORB build time
+128941759 Total time
+Orb total: 515043
+Essential total: 415316
+100051 ORB build time
+128944900 Total time
+Orb total: 515031
+Essential total: 415347
+100052 ORB build time
+128934840 Total time
+Orb total: 515034
+Essential total: 415337
+100058 ORB build time
+128934830 Total time
+Orb total: 515012
+Essential total: 415316
+128938772 Total time
+Orb total: 515035
+Essential total: 415348
+100057 ORB build time
+128947920 Total time
+Orb total: 515015
+Essential total: 415315
+100053 ORB build time
+128951164 Total time
+Orb total: 515036
+Essential total: 415343
+100058 ORB build time
+128954315 Total time
+Orb total: 515044
+Essential total: 415311
