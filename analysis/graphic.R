@@ -190,8 +190,8 @@ total_time_all$toDisplay <- total_time_all$calcTime
 
 graphic_for_total_time(
         total_time_all,
-        "Време за работа на програмата спрямо брой процесори",
-        "Брой процесори",
+        "Време за работа на програмата спрямо брой процеси",
+        "Брой процеси",
         "Време в микросекунди")
 
 
@@ -201,8 +201,8 @@ total_time_all$toDisplay <- total_time_all$speedup
 
 graphic_for_total_time(
         total_time_all,
-        "Ускорението на програмата спрямо брой процесори",
-        "Брой процесори",
+        "Ускорението на програмата спрямо брой процеси",
+        "Брой процеси",
         "Ускорение")
 
 ggsave("./png/totalSpeedup.png", width = 9)
@@ -212,8 +212,8 @@ total_time_all$toDisplay <- total_time_all$speedup / total_time_all$numProc
 
 graphic_for_total_time(
         total_time_all,
-        "Ефективността на програмата спрямо брой процесори",
-        "Брой процесори",
+        "Ефективността на програмата спрямо брой процеси",
+        "Брой процеси",
         "Ефективност")
 
 ggsave("./png/totalEfficiency.png", width = 9)
