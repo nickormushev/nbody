@@ -1,6 +1,7 @@
 library(ggplot2)
 library(tidyverse)
 require(scales)
+library(grid)
 
 theme_set(theme_bw())
 
@@ -119,6 +120,9 @@ graphic(min_time_per_proc, "Брой процеси", "Ефективност",
 ggsave("./200thou/png/200thouTotalTimeEfficency.png", width = 9)
 
 #Barplot for calculations work per processor
+calculation_time <- read.csv("./orb/calculations200thouNoORB.csv")
+calculation_time_ORB <- read.csv("./orb/calculations200thouORB.csv")
+
 calc16 <- calculation_time[calculation_time$numProc == 16, ]
 colnames(calc16)
 
@@ -142,18 +146,22 @@ processor_avg <- data.frame(
 
 options(scipen = 999)
 
-p <- ggplot(data = processor_avg,
+p1 <- ggplot(data = processor_avg,
             aes(x = as.factor(processor_id), y = avg_time)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label = round(avg_time)), vjust = 1.6,
               color = "white", size = 3.5) +
     xlab("Идентификатор на процесора") +
-    ggtitle("Време прекарано в смятане на взаимодействия между телата") +
+    ggtitle("Време прекарано в смятане на взаимодействия между телата без ORB") +
     theme(plot.title = element_text(hjust = 0.5)) +
     ylab("Време в миркосекунди")
 p
+p1
+
+gridExtra::grid.arrange(p, p1, col = 2)
 
 ggsave("./200thou/png/timeSpentInCalculationsPerProcessor.png", width = 13, height = 7)
+ggsave("./orb/png/timeSpentInCalculationsPerProcessor.png", width = 15, height = 10, gridExtra::arrangeGrob(p, p1))
 
 
 #Get diagram with data not only for 200 processors
