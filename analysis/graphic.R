@@ -25,7 +25,7 @@ get_min_total_time  <- function(total_time) {
             total_time$iteration == 1, ]$time)
 
         for (i in c(2, 3)) {
-           min_time <- min(min_time, max(
+            min_time <- min(min_time, max(
                     total_time[total_time$processorCount == numProc &
                     total_time$iteration == i, ]$time)
            )
@@ -45,6 +45,8 @@ names(min_time_per_proc)
 
 min_time_per_proc  <-  get_min_total_time(total_time200)
 
+min_time_per_proc
+
 #gets the max time for the processors and
 #then the min total time for each attempt
 
@@ -54,8 +56,11 @@ graphic(min_time_per_proc, "Брой процеси", "Време в микро�
 ggsave("./200thou/png/200thouTime.png", width = 9)
 
 calculation_time <- read.csv("./200thou/data/calculations200thou.csv")
-head(calculation_time, n = 20)
-iterations <- 10
+total_time200 <- read.csv("./200thou/data/totalTime200thou.csv")
+
+min_time_per_proc  <-  get_min_total_time(total_time200)
+head(calculation_time, n = 3)
+iterations <- 5
 
 min_calc_time <- data.frame(numProc = numeric(), calcTime = numeric())
 colnames(calculation_time)
@@ -70,7 +75,7 @@ for (numProc in c(1, 2, 4, 8, 16, 32)) {
 
         #create a matrx where every row are the times
         #for each processor during a  different iteration
-        m <- matrix(calc_i$time, nrow = iterations, ncol = numProc)
+        m <- matrix(calc_i$time, nrow = iterations, ncol = numProc, byrow = T)
 
         #Takes the max time for a processor during a single unit of time
         max_times_for_attempt <- apply(m, 1, max, na.rm = T)
@@ -79,7 +84,6 @@ for (numProc in c(1, 2, 4, 8, 16, 32)) {
     }
 
     max_times
-
     min_calc_time[nrow(min_calc_time) + 1, ] <- c(numProc, min(max_times))
 }
 
@@ -91,16 +95,17 @@ overhead_vs_calc_time
 
 overhead_vs_calc_time$cat <- c(rep("изчисление", 6), rep("изчисление плюс комуникация", 6))
 
+
 ggplot(overhead_vs_calc_time, aes(x = numProc, y = calcTime, group = cat, col = cat)) +
    geom_point() +
    geom_line() +
    scale_y_continuous(labels = comma) +
-   ggtitle("Времето за изчисление срещу времето за изчисление и комуникация при 200 хиляди тела") +
+   ggtitle("Времето за изчисление срещу времето за изчисление и комуникация при 500 хиляди тела") +
    theme(plot.title = element_text(hjust = 0.5)) +
-   xlab("Брой процесори") +
+   xlab("Брой процеси") +
    ylab("Време в микросекунди")
 
-ggsave("./200thou/png/200thouCalcVsTotalTime.png", width = 10)
+ggsave("./png/500thouCalcVsTotalTime.png", width = 10)
 
 
 #Speedup calculation_time for one process/ calculation_time for n processes
